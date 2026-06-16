@@ -3,530 +3,407 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>챗봇 성능 점검기</title>
+<title>프롬프트 업그레이더</title>
 <style>
-  :root {
-    --navy: #1F3864;
-    --blue: #2E75B6;
-    --light-blue: #EBF3FB;
-    --orange: #E36B1A;
-    --gray: #595959;
-    --light-gray: #F5F5F5;
-    --border: #D9D9D9;
-    --pass: #375623;
-    --pass-bg: #E2EFDA;
-    --fail: #C00000;
-    --fail-bg: #FFE0E0;
-    --skip-bg: #FFF3CD;
-    --skip: #856404;
-    --white: #FFFFFF;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: #F0F4F8; color: #222; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:#F8F8F6;color:#111;min-height:100vh}
+.wrap{max-width:800px;margin:0 auto;padding:28px 16px 40px}
 
-  header {
-    background: var(--navy);
-    color: white;
-    padding: 20px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
-  header p { font-size: 13px; color: #9DC3E6; margin-top: 2px; }
-  .header-right { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.hero{background:#1a1a1a;border-radius:14px;padding:28px 28px 22px;margin-bottom:18px}
+.hero-badge{background:#F5C518;color:#1a1a1a;font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px;letter-spacing:.5px;display:inline-block;margin-bottom:10px}
+.hero h1{font-size:24px;font-weight:800;color:white;letter-spacing:-.5px}
+.hero p{font-size:13px;color:#888;margin-top:5px}
+.hero-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.htag{background:rgba(245,197,24,.12);color:#F5C518;border:1px solid rgba(245,197,24,.2);border-radius:5px;padding:2px 9px;font-size:11px;font-weight:700}
 
-  .btn {
-    padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600;
-    cursor: pointer; border: none; transition: all 0.15s;
-  }
-  .btn-white { background: white; color: var(--navy); }
-  .btn-white:hover { background: #EBF3FB; }
-  .btn-orange { background: var(--orange); color: white; }
-  .btn-orange:hover { background: #c55a12; }
-  .btn-blue { background: var(--blue); color: white; }
-  .btn-blue:hover { background: #1a5a9a; }
-  .btn-sm { padding: 5px 11px; font-size: 12px; border-radius: 4px; }
+.card{background:white;border-radius:12px;border:1px solid #E5E5E5;padding:20px;margin-bottom:14px}
+.section-label{font-size:11px;font-weight:800;color:#AAA;letter-spacing:.4px;text-transform:uppercase;margin-bottom:10px}
 
-  main { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+.ai-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:0}
+.ai-tab{border:1.5px solid #E5E5E5;border-radius:8px;padding:10px 8px;text-align:center;cursor:pointer;transition:all .15s;background:white}
+.ai-tab:hover{border-color:#CCC;background:#FAFAFA}
+.ai-tab.active{border-width:2px}
+.ai-tab .ai-icon{font-size:20px;margin-bottom:4px}
+.ai-tab .ai-name{font-size:12px;font-weight:800;display:block}
+.ai-tab .ai-sub{font-size:10px;color:#AAA;display:block;margin-top:1px}
 
-  .top-bar {
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 12px; margin-bottom: 20px;
-  }
-  .set-selector {
-    display: flex; align-items: center; gap: 10px;
-    background: white; border: 1px solid var(--border);
-    border-radius: 8px; padding: 10px 16px;
-  }
-  .set-selector label { font-size: 13px; color: var(--gray); font-weight: 600; }
-  .set-selector select {
-    border: none; font-size: 14px; font-weight: 700;
-    color: var(--navy); background: transparent; cursor: pointer; outline: none;
-  }
+.tab-claude.active{border-color:#D97706;background:#FFFBEB}
+.tab-claude .ai-name{color:#D97706}
+.tab-gpt.active{border-color:#10A37F;background:#F0FDF8}
+.tab-gpt .ai-name{color:#10A37F}
+.tab-gemini.active{border-color:#4285F4;background:#EFF6FF}
+.tab-gemini .ai-name{color:#4285F4}
+.tab-demo.active{border-color:#7C3AED;background:#F5F3FF}
+.tab-demo .ai-name{color:#7C3AED}
 
-  .score-bar {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 12px; margin-bottom: 24px;
-  }
-  .score-card {
-    background: white; border-radius: 10px; border: 1px solid var(--border);
-    padding: 14px 16px; text-align: center;
-  }
-  .score-card .num { font-size: 28px; font-weight: 700; }
-  .score-card .lbl { font-size: 12px; color: var(--gray); margin-top: 2px; }
-  .score-card.pass .num { color: var(--pass); }
-  .score-card.fail .num { color: var(--fail); }
-  .score-card.total .num { color: var(--navy); }
-  .score-card.pct .num { color: var(--orange); }
+.api-setup{margin-top:14px;padding-top:14px;border-top:1px solid #F0F0F0}
+.api-row{display:flex;gap:8px;align-items:center}
+.api-input{flex:1;border:1.5px solid #E0E0E0;border-radius:7px;padding:9px 12px;font-size:13px;font-family:monospace;outline:none;transition:border .15s;color:#333}
+.api-input:focus{border-color:#F5C518}
+.api-input::placeholder{color:#CCC;font-family:'Malgun Gothic',sans-serif;font-size:12px}
+.save-btn{background:#1a1a1a;color:white;border:none;border-radius:7px;padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.save-btn:hover{background:#333}
+.api-hint{font-size:11px;color:#AAA;margin-top:7px;line-height:1.6}
+.api-hint a{color:#4285F4;text-decoration:none}
+.api-hint a:hover{text-decoration:underline}
 
-  .progress-wrap { background: white; border-radius: 10px; border: 1px solid var(--border); padding: 16px 20px; margin-bottom: 24px; }
-  .progress-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
-  .progress-track { height: 10px; background: #EEE; border-radius: 99px; overflow: hidden; }
-  .progress-fill { height: 100%; background: linear-gradient(90deg, #2E75B6, #375623); border-radius: 99px; transition: width 0.4s; }
+.demo-notice{background:#F5F3FF;border:1px solid #DDD6FE;border-radius:8px;padding:12px 14px;font-size:12px;color:#5B21B6;margin-top:14px;line-height:1.6;display:none}
 
-  .q-list { display: flex; flex-direction: column; gap: 14px; }
+.input-area{margin-top:14px;padding-top:14px;border-top:1px solid #F0F0F0}
+.input-row{display:flex;gap:10px;align-items:flex-end}
+.main-input{flex:1;border:1.5px solid #E0E0E0;border-radius:8px;padding:12px 14px;font-size:14px;font-family:inherit;outline:none;transition:border .15s;resize:none;min-height:54px;line-height:1.6}
+.main-input:focus{border-color:#F5C518}
+.main-input::placeholder{color:#CCC}
+.gen-btn{background:#F5C518;color:#1a1a1a;border:none;border-radius:8px;padding:12px 20px;font-size:14px;font-weight:800;cursor:pointer;transition:all .15s;white-space:nowrap;min-height:54px;min-width:110px}
+.gen-btn:hover{background:#e0b010}
+.gen-btn:disabled{background:#DDD;color:#999;cursor:not-allowed}
 
-  .q-card {
-    background: white; border-radius: 10px;
-    border: 1px solid var(--border); overflow: hidden;
-    transition: box-shadow 0.15s;
-  }
-  .q-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
-  .q-card.pass-card { border-left: 4px solid var(--pass); }
-  .q-card.fail-card { border-left: 4px solid var(--fail); }
-  .q-card.skip-card { border-left: 4px solid #FFC107; }
+.examples{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;align-items:center}
+.ex-lbl{font-size:11px;color:#AAA}
+.ex-tag{background:#F5F5F5;border:1px solid #E5E5E5;border-radius:6px;padding:4px 10px;font-size:12px;color:#555;cursor:pointer;transition:all .15s}
+.ex-tag:hover{background:#FFF8DC;border-color:#F5C518;color:#1a1a1a}
 
-  .q-header {
-    display: flex; align-items: flex-start; gap: 12px;
-    padding: 14px 18px; cursor: pointer;
-  }
-  .q-num {
-    min-width: 28px; height: 28px; border-radius: 50%;
-    background: var(--light-blue); color: var(--navy);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 700; flex-shrink: 0; margin-top: 1px;
-  }
-  .q-text { flex: 1; }
-  .q-title { font-size: 14px; font-weight: 700; color: #111; line-height: 1.5; }
-  .q-meta { font-size: 12px; color: var(--gray); margin-top: 3px; }
-  .q-badge {
-    padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700;
-    flex-shrink: 0; margin-top: 2px;
-  }
-  .badge-pass { background: var(--pass-bg); color: var(--pass); }
-  .badge-fail { background: var(--fail-bg); color: var(--fail); }
-  .badge-skip { background: var(--skip-bg); color: var(--skip); }
-  .badge-none { background: #EEE; color: #888; }
+.error-box{background:#FFF0F0;border:1px solid #FFBBBB;border-radius:7px;padding:12px 14px;font-size:13px;color:#C00;margin-top:12px;line-height:1.6;display:none}
 
-  .q-body { border-top: 1px solid #EEE; padding: 14px 18px 18px; display: none; }
-  .q-body.open { display: block; }
+.loading{text-align:center;padding:36px;display:none}
+.spin{width:34px;height:34px;border:3px solid #EEE;border-top-color:#F5C518;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading p{font-size:13px;color:#888}
 
-  .field-label { font-size: 12px; font-weight: 700; color: var(--gray); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .keyword-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
-  .kw-tag {
-    padding: 3px 10px; border-radius: 99px; font-size: 12px;
-    background: var(--light-blue); color: var(--navy); font-weight: 600;
-    cursor: pointer; border: 1.5px solid transparent; transition: all 0.15s;
-  }
-  .kw-tag:hover { background: #D0E8F8; }
-  .kw-tag.found { background: var(--pass-bg); color: var(--pass); border-color: var(--pass); }
-  .kw-tag.missing { background: var(--fail-bg); color: var(--fail); border-color: var(--fail); }
+.result-wrap{display:none}
 
-  .answer-box {
-    width: 100%; min-height: 100px; border: 1px solid var(--border);
-    border-radius: 8px; padding: 10px 12px; font-size: 13px;
-    font-family: inherit; resize: vertical; outline: none; transition: border 0.15s;
-    line-height: 1.6;
-  }
-  .answer-box:focus { border-color: var(--blue); }
+.elem-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:14px}
+.elem-card{background:white;border-radius:10px;border:1px solid #E5E5E5;padding:14px;border-top:3px solid #F5C518}
+.elem-num{font-size:10px;font-weight:800;color:#F5C518;letter-spacing:.4px;margin-bottom:2px}
+.elem-name{font-size:13px;font-weight:700;color:#111;margin-bottom:5px}
+.elem-body{font-size:12px;color:#555;line-height:1.6}
 
-  .judge-row { display: flex; gap: 8px; margin-top: 10px; align-items: center; flex-wrap: wrap; }
-  .judge-btn {
-    padding: 6px 18px; border-radius: 6px; font-size: 13px; font-weight: 700;
-    cursor: pointer; border: 2px solid transparent; transition: all 0.15s;
-  }
-  .judge-pass { background: var(--pass-bg); color: var(--pass); border-color: var(--pass); }
-  .judge-pass:hover, .judge-pass.active { background: var(--pass); color: white; }
-  .judge-fail { background: var(--fail-bg); color: var(--fail); border-color: var(--fail); }
-  .judge-fail:hover, .judge-fail.active { background: var(--fail); color: white; }
-  .judge-skip { background: var(--skip-bg); color: var(--skip); border-color: #FFC107; }
-  .judge-skip:hover, .judge-skip.active { background: #FFC107; color: #4a3800; }
-  .auto-check-btn { margin-left: auto; }
+.prompt-out{background:#1a1a1a;border-radius:12px;padding:20px 22px;margin-bottom:14px}
+.prompt-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.prompt-lbl{font-size:11px;font-weight:800;color:#F5C518;letter-spacing:.4px}
+.copy-btn{background:rgba(245,197,24,.15);color:#F5C518;border:1px solid rgba(245,197,24,.25);border-radius:6px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s}
+.copy-btn:hover{background:rgba(245,197,24,.3)}
+.prompt-text{font-size:13px;color:#E0E0E0;line-height:1.9;white-space:pre-wrap;font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif}
 
-  .hint { font-size: 12px; color: var(--gray); margin-top: 8px; }
+.action-row{display:flex;gap:8px;justify-content:center}
+.reset-btn{background:white;border:1.5px solid #E5E5E5;border-radius:8px;padding:10px 22px;font-size:13px;font-weight:700;color:#555;cursor:pointer;transition:all .15s}
+.reset-btn:hover{border-color:#F5C518;color:#1a1a1a}
+.use-btn{background:#1a1a1a;color:#F5C518;border:none;border-radius:8px;padding:10px 22px;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+.use-btn:hover{background:#333}
 
-  .modal-overlay {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-    z-index: 100; align-items: center; justify-content: center;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: white; border-radius: 12px; padding: 28px;
-    width: 90%; max-width: 560px; max-height: 85vh; overflow-y: auto;
-  }
-  .modal h2 { font-size: 18px; font-weight: 700; color: var(--navy); margin-bottom: 16px; }
-  .modal textarea {
-    width: 100%; height: 320px; border: 1px solid var(--border); border-radius: 8px;
-    padding: 10px 12px; font-size: 12px; font-family: monospace; resize: vertical;
-  }
-  .modal-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
-
-  .result-modal .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-  .result-item { background: var(--light-gray); border-radius: 8px; padding: 12px; text-align: center; }
-  .result-item .rn { font-size: 24px; font-weight: 700; }
-  .result-item .rl { font-size: 12px; color: var(--gray); }
-  .result-bar { height: 12px; background: #EEE; border-radius: 99px; overflow: hidden; margin: 10px 0; }
-  .result-fill { height: 100%; border-radius: 99px; }
-
-  .export-area { background: var(--light-gray); border-radius: 8px; padding: 12px; font-size: 12px; font-family: monospace; white-space: pre-wrap; max-height: 200px; overflow-y: auto; margin-top: 12px; }
-
-  @media (max-width: 600px) {
-    header { padding: 16px 16px; }
-    main { padding: 16px 12px; }
-    .q-header { padding: 12px 14px; }
-    .q-body { padding: 12px 14px 16px; }
-  }
+.footer{text-align:center;font-size:11px;color:#BBB;margin-top:20px}
 </style>
 </head>
 <body>
+<div class="wrap">
 
-<header>
-  <div>
-    <h1>🤖 챗봇 성능 점검기</h1>
-    <p>질문 세트를 선택하고 실제 답변을 입력하여 챗봇 성능을 점검하세요</p>
-  </div>
-  <div class="header-right">
-    <button class="btn btn-white" onclick="openImport()">📂 세트 불러오기</button>
-    <button class="btn btn-white" onclick="openExport()">📤 내보내기</button>
-    <button class="btn btn-orange" onclick="showResult()">📊 결과 보기</button>
-  </div>
-</header>
-
-<main>
-  <div class="top-bar">
-    <div class="set-selector">
-      <label>테스트 세트</label>
-      <select id="setSelect" onchange="loadSet(this.value)">
-        <option value="universal" selected>🏭 제조업 범용 테스트 세트</option>
-        <option value="qc">품질관리 챗봇 (셰익스제조 전용)</option>
-        <option value="custom">사용자 정의 세트</option>
-      </select>
-    </div>
-    <div style="display:flex; gap:8px;">
-      <button class="btn btn-sm btn-blue" onclick="resetAll()">초기화</button>
-      <button class="btn btn-sm btn-orange" onclick="autoCheckAll()">자동 키워드 체크</button>
+  <div class="hero">
+    <div class="hero-badge">PROMPT UPGRADER v2</div>
+    <h1>프롬프트 업그레이더</h1>
+    <p>한 줄 질문 → 7가지 품질 요소가 완벽하게 담긴 프롬프트로 변환</p>
+    <div class="hero-tags">
+      <span class="htag">00 전문성</span>
+      <span class="htag">01 정확성</span>
+      <span class="htag">02 일관성</span>
+      <span class="htag">03 완결성</span>
+      <span class="htag">04 명료성</span>
+      <span class="htag">05 관련성</span>
+      <span class="htag">06 실행가능성</span>
     </div>
   </div>
 
-  <div class="score-bar">
-    <div class="score-card total"><div class="num" id="sc-total">10</div><div class="lbl">전체 문항</div></div>
-    <div class="score-card pass"><div class="num" id="sc-pass">0</div><div class="lbl">합격 ✅</div></div>
-    <div class="score-card fail"><div class="num" id="sc-fail">0</div><div class="lbl">불합격 ❌</div></div>
-    <div class="score-card pct"><div class="num" id="sc-pct">0%</div><div class="lbl">점수</div></div>
-  </div>
+  <div class="card">
+    <div class="section-label">AI 선택 및 API 키 설정</div>
 
-  <div class="progress-wrap">
-    <div class="progress-label">
-      <span style="font-size:13px; font-weight:600;">진행률</span>
-      <span id="prog-label" style="font-size:13px; color:var(--gray);">0 / 10 완료</span>
+    <div class="ai-tabs">
+      <div class="ai-tab tab-claude active" onclick="selectAI('claude')">
+        <div class="ai-icon">🟠</div>
+        <span class="ai-name">Claude</span>
+        <span class="ai-sub">Anthropic</span>
+      </div>
+      <div class="ai-tab tab-gpt" onclick="selectAI('gpt')">
+        <div class="ai-icon">🟢</div>
+        <span class="ai-name">ChatGPT</span>
+        <span class="ai-sub">OpenAI</span>
+      </div>
+      <div class="ai-tab tab-gemini" onclick="selectAI('gemini')">
+        <div class="ai-icon">🔵</div>
+        <span class="ai-name">Gemini</span>
+        <span class="ai-sub">Google</span>
+      </div>
+      <div class="ai-tab tab-demo" onclick="selectAI('demo')">
+        <div class="ai-icon">🟣</div>
+        <span class="ai-name">데모 모드</span>
+        <span class="ai-sub">API 없이 테스트</span>
+      </div>
     </div>
-    <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
-  </div>
 
-  <div class="q-list" id="qList"></div>
-</main>
-
-<!-- Import Modal -->
-<div class="modal-overlay" id="importModal">
-  <div class="modal">
-    <h2>📂 질문 세트 불러오기 (JSON)</h2>
-    <p style="font-size:13px; color:var(--gray); margin-bottom:10px;">아래 형식의 JSON을 붙여넣으면 새 세트로 등록됩니다.</p>
-    <textarea id="importText" placeholder='{
-  "name": "HR 챗봇 테스트",
-  "questions": [
-    {
-      "q": "연차 신청은 어떻게 하나요?",
-      "type": "절차 안내",
-      "keywords": ["그룹웨어", "5일 전", "팀장 승인"]
-    }
-  ]
-}'></textarea>
-    <div class="modal-btns">
-      <button class="btn btn-white" onclick="closeModal('importModal')">취소</button>
-      <button class="btn btn-blue" onclick="applyImport()">불러오기</button>
+    <div class="api-setup" id="apiSetup">
+      <div class="api-row">
+        <input class="api-input" type="password" id="apiKeyInput" placeholder="API 키를 입력하세요 (sk-ant-...)" />
+        <button class="save-btn" onclick="saveKey()">저장</button>
+      </div>
+      <div class="api-hint" id="apiHint">
+        Claude API 키 발급: <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> · 키는 브라우저에만 저장되며 외부로 전송되지 않습니다.
+      </div>
     </div>
-  </div>
-</div>
 
-<!-- Export Modal -->
-<div class="modal-overlay" id="exportModal">
-  <div class="modal">
-    <h2>📤 결과 내보내기</h2>
-    <div class="export-area" id="exportContent"></div>
-    <div class="modal-btns">
-      <button class="btn btn-white" onclick="closeModal('exportModal')">닫기</button>
-      <button class="btn btn-blue" onclick="copyExport()">복사</button>
+    <div class="demo-notice" id="demoNotice">
+      🟣 <strong>데모 모드</strong> — API 키 없이 7가지 요소 구조를 미리 체험할 수 있습니다. 실제 AI 생성 결과가 아닌 예시 답변이 표시됩니다.
     </div>
-  </div>
-</div>
 
-<!-- Result Modal -->
-<div class="modal-overlay" id="resultModal">
-  <div class="modal result-modal">
-    <h2>📊 최종 점검 결과</h2>
-    <div class="result-grid" id="resultGrid"></div>
-    <div class="result-bar"><div class="result-fill" id="resultFill" style="width:0%"></div></div>
-    <p id="resultComment" style="font-size:14px; font-weight:600; text-align:center; margin:8px 0;"></p>
-    <div class="export-area" id="resultDetail"></div>
-    <div class="modal-btns">
-      <button class="btn btn-white" onclick="closeModal('resultModal')">닫기</button>
-      <button class="btn btn-orange" onclick="copyExport(); closeModal('resultModal')">결과 복사</button>
+    <div class="input-area">
+      <div class="section-label">질문 입력</div>
+      <div class="input-row">
+        <textarea class="main-input" id="userInput" placeholder="예) 사출 공정 불량률이 갑자기 올라갔어" rows="2"></textarea>
+        <button class="gen-btn" id="genBtn" onclick="generate()">업그레이드 ↗</button>
+      </div>
+      <div class="examples">
+        <span class="ex-lbl">예시</span>
+        <span class="ex-tag" onclick="setEx(this)">불량률 계산해줘</span>
+        <span class="ex-tag" onclick="setEx(this)">클레임 들어왔어</span>
+        <span class="ex-tag" onclick="setEx(this)">수입 검사 방법</span>
+        <span class="ex-tag" onclick="setEx(this)">마케팅 전략 알려줘</span>
+        <span class="ex-tag" onclick="setEx(this)">이메일 써줘</span>
+        <span class="ex-tag" onclick="setEx(this)">보고서 형식</span>
+      </div>
+      <div class="error-box" id="errorBox"></div>
     </div>
   </div>
+
+  <div class="loading" id="loading">
+    <div class="spin"></div>
+    <p id="loadingMsg">7가지 품질 요소를 분석하고 프롬프트를 생성하는 중...</p>
+  </div>
+
+  <div class="result-wrap" id="resultWrap">
+    <div class="elem-grid" id="elemGrid"></div>
+    <div class="prompt-out">
+      <div class="prompt-hd">
+        <span class="prompt-lbl">✦ 업그레이드된 프롬프트</span>
+        <button class="copy-btn" onclick="copyPrompt()">복사</button>
+      </div>
+      <div class="prompt-text" id="promptText"></div>
+    </div>
+    <div class="action-row">
+      <button class="reset-btn" onclick="resetAll()">새 질문 입력</button>
+      <button class="use-btn" onclick="copyPrompt()">프롬프트 복사 후 사용 ↗</button>
+    </div>
+  </div>
+
+  <div class="footer">Powered by AI API · 셰익스컴퍼니 · 키는 브라우저에만 저장됩니다</div>
 </div>
 
 <script>
-const SETS = {
-  universal:{
-    name:"제조업 범용 테스트 세트",
-    questions:[
-      {q:"이번 주 생산량 5,000개 중 불량 35개 발생했어. 불량률 계산하고 목표 0.5% 대비 상태 알려줘.",type:"계산·분석",keywords:["0.7%","초과","목표","0.5%"]},
-      {q:"외관 불량 판정 기준이 뭐야? 합격·불합격 구분 방법 알려줘.",type:"판정 기준",keywords:["기준","합격","불합격","육안","치수"]},
-      {q:"치수 불량이 반복 발생하고 있어. 근본 원인 분석 방법 알려줘.",type:"원인 분석",keywords:["4M","5-Why","특성요인도","원인","분석"]},
-      {q:"고객 클레임이 접수됐어. 초기 대응 절차를 8D 방식으로 알려줘.",type:"절차 안내",keywords:["D1","D2","D3","봉쇄","격리","TF"]},
-      {q:"협력사에서 납품된 부품을 수입 검사해야 해. 샘플링 방법이랑 합격 판정 기준 알려줘.",type:"검사 기준",keywords:["샘플링","로트","합격","Ac","AQL"]},
-      {q:"불량 보고서 작성할 때 꼭 들어가야 하는 항목이 뭐야?",type:"양식 안내",keywords:["발생일","공정","수량","원인","조치","재발방지"]},
-      {q:"시정조치(CAPA) 완료 후 효과가 있는지 어떻게 확인해?",type:"검증 방법",keywords:["효과 검증","불량률","비교","추적","재발"]},
-      {q:"출하 전 최종 검사에서 확인해야 할 항목이 뭐야?",type:"출하 검사",keywords:["외관","치수","기능","성적서","샘플링"]},
-      {q:"공정 중 불량률이 갑자기 올라갔어. 즉시 취해야 할 조치 순서 알려줘.",type:"긴급 대응",keywords:["라인 정지","격리","원인","보고","조치"]},
-      {q:"품질 개선 활동 결과를 경영진에게 보고할 때 어떤 형식이 좋아?",type:"보고서 형식",keywords:["현황","원인","조치","효과","수치","그래프"]},
-    ]
-  },
+const ELEMENTS=[
+  {key:"persona",num:"00",name:"전문성 (Persona)",desc:"역할 설정"},
+  {key:"accuracy",num:"01",name:"정확성 (Accuracy)",desc:"사실 기반"},
+  {key:"consistency",num:"02",name:"일관성 (Consistency)",desc:"모순 없는 답변"},
+  {key:"completeness",num:"03",name:"완결성 (Completeness)",desc:"빠짐없는 항목"},
+  {key:"clarity",num:"04",name:"명료성 (Clarity)",desc:"이해하기 쉽게"},
+  {key:"relevance",num:"05",name:"관련성 (Relevance)",desc:"요청에 집중"},
+  {key:"actionability",num:"06",name:"실행가능성 (Actionability)",desc:"즉시 적용 가능"},
+];
 
-  qc: {
-    name: "품질관리 챗봇 (제조업)",
-    questions: [
-      { q: "DEF-INJ-003 코드 불량 원인과 시정조치를 알려줘.", type: "코드 조회", keywords: ["플래시", "Flash", "버", "형체력", "금형", "클리어런스"] },
-      { q: "사출 공정 외관 불량 판정 기준을 알려줘.", type: "매뉴얼 인용", keywords: ["0.2mm", "수축", "웰드", "0.3mm", "4.1", "4.2"] },
-      { q: "오늘 사출 라인에서 수축 흔적 20개 발생했어. 생산량 4000개 기준 불량률 계산해줘.", type: "계산·분석", keywords: ["0.5%", "0.5 %", "목표", "기준"] },
-      { q: "프레스 DEF-PRS-002 코드 시정조치 절차를 단계별로 알려줘.", type: "절차 안내", keywords: ["균열", "Crack", "소재", "R 반경", "자분"] },
-      { q: "고객 클레임 발생 시 첫 대응 절차를 8D 기준으로 알려줘.", type: "절차 안내", keywords: ["D1", "D2", "D3", "봉쇄", "격리", "TF"] },
-      { q: "도장 공정 핀홀 허용 기준과 관련 불량 코드를 알려줘.", type: "코드 조회", keywords: ["DEF-PNT-001", "0.3mm", "핀홀", "Pin Hole", "부스"] },
-      { q: "이번 달 공정 불량률이 3.2%인데 목표 대비 상태를 알려줘.", type: "목표 비교", keywords: ["0.5%", "초과", "목표", "개선"] },
-      { q: "1차 협력사 부품 수입 검사 기준과 샘플링 방법을 알려줘.", type: "검사 기준", keywords: ["샘플링", "로트", "KS Q", "2859", "AQL", "Ac", "QF-001"] },
-      { q: "QF-003 불량 보고서 작성 방법을 알려줘.", type: "양식 안내", keywords: ["QF-003", "불량 보고서", "5W1H", "원인", "조치"] },
-      { q: "내부 감사 전 준비 체크리스트 항목을 알려줘.", type: "체크리스트", keywords: ["문서", "기록", "현장", "개정", "ISO", "감사"] },
-    ]
+const AI_CONFIG={
+  claude:{
+    name:"Claude",placeholder:"sk-ant-api... (Anthropic Console에서 발급)",
+    hint:'Claude API 키 발급: <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>'
   },
-  custom: {
-    name: "사용자 정의 세트",
-    questions: [
-      { q: "여기에 테스트할 질문을 입력하세요.", type: "사용자 정의", keywords: ["키워드1", "키워드2"] },
-    ]
-  }
+  gpt:{
+    name:"ChatGPT",placeholder:"sk-... (OpenAI Platform에서 발급)",
+    hint:'OpenAI API 키 발급: <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a>'
+  },
+  gemini:{
+    name:"Gemini",placeholder:"AIza... (Google AI Studio에서 발급)",
+    hint:'Gemini API 키 발급: <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a>'
+  },
+  demo:{name:"데모 모드",placeholder:"",hint:""}
 };
 
-let currentSet = "universal";
-let answers = {};
-let verdicts = {};
+let currentAI="claude";
+let savedKeys={claude:"",gpt:"",gemini:""};
 
-function loadSet(key) {
-  currentSet = key;
-  answers = {};
-  verdicts = {};
-  render();
-}
-
-function render() {
-  const set = SETS[currentSet];
-  const ql = document.getElementById("qList");
-  ql.innerHTML = "";
-  set.questions.forEach((q, i) => {
-    const verdict = verdicts[i] || "none";
-    const cardClass = verdict === "pass" ? "pass-card" : verdict === "fail" ? "fail-card" : verdict === "skip" ? "skip-card" : "";
-    const badgeClass = verdict === "pass" ? "badge-pass" : verdict === "fail" ? "badge-fail" : verdict === "skip" ? "badge-skip" : "badge-none";
-    const badgeText = verdict === "pass" ? "✅ 합격" : verdict === "fail" ? "❌ 불합격" : verdict === "skip" ? "⏭ 건너뜀" : "미평가";
-
-    const kwHtml = q.keywords.map(kw => {
-      const ans = (answers[i] || "").toLowerCase();
-      const found = ans && ans.includes(kw.toLowerCase());
-      const cls = ans ? (found ? "found" : "missing") : "";
-      return `<span class="kw-tag ${cls}" title="${found ? '포함됨' : ans ? '미포함' : '답변 없음'}">${kw}</span>`;
-    }).join("");
-
-    const bodyOpen = (answers[i] || verdict !== "none") ? "open" : "";
-
-    ql.innerHTML += `
-      <div class="q-card ${cardClass}" id="card-${i}">
-        <div class="q-header" onclick="toggleBody(${i})">
-          <div class="q-num">${i+1}</div>
-          <div class="q-text">
-            <div class="q-title">${q.q}</div>
-            <div class="q-meta">유형: ${q.type} · 핵심 키워드 ${q.keywords.length}개</div>
-          </div>
-          <span class="q-badge ${badgeClass}">${badgeText}</span>
-        </div>
-        <div class="q-body ${bodyOpen}" id="body-${i}">
-          <div class="field-label">핵심 키워드 (답변에 포함되어야 할 내용)</div>
-          <div class="keyword-list" id="kw-${i}">${kwHtml}</div>
-          <div class="field-label">실제 챗봇 답변 붙여넣기</div>
-          <textarea class="answer-box" id="ans-${i}" placeholder="챗봇에 위 질문을 입력하고 답변을 여기에 붙여넣으세요..."
-            oninput="saveAnswer(${i})" rows="5">${answers[i] || ""}</textarea>
-          <div class="judge-row">
-            <button class="judge-btn judge-pass ${verdict==='pass'?'active':''}" onclick="setVerdict(${i},'pass')">✅ 합격</button>
-            <button class="judge-btn judge-fail ${verdict==='fail'?'active':''}" onclick="setVerdict(${i},'fail')">❌ 불합격</button>
-            <button class="judge-btn judge-skip ${verdict==='skip'?'active':''}" onclick="setVerdict(${i},'skip')">⏭ 건너뜀</button>
-            <button class="btn btn-sm btn-blue auto-check-btn" onclick="autoCheck(${i})">🔍 자동 체크</button>
-          </div>
-          <p class="hint">💡 키워드 자동 체크는 참고용입니다. 최종 판정은 직접 해주세요.</p>
-        </div>
-      </div>`;
-  });
-  updateScore();
-}
-
-function toggleBody(i) {
-  const body = document.getElementById(`body-${i}`);
-  body.classList.toggle("open");
-}
-
-function saveAnswer(i) {
-  answers[i] = document.getElementById(`ans-${i}`).value;
-  updateKeywords(i);
-  updateScore();
-}
-
-function updateKeywords(i) {
-  const set = SETS[currentSet];
-  const ans = (answers[i] || "").toLowerCase();
-  const kwDiv = document.getElementById(`kw-${i}`);
-  if (!kwDiv) return;
-  kwDiv.innerHTML = set.questions[i].keywords.map(kw => {
-    const found = ans && ans.includes(kw.toLowerCase());
-    const cls = ans ? (found ? "found" : "missing") : "";
-    return `<span class="kw-tag ${cls}">${kw}</span>`;
-  }).join("");
-}
-
-function setVerdict(i, v) {
-  verdicts[i] = v;
-  const card = document.getElementById(`card-${i}`);
-  card.className = "q-card " + (v==="pass" ? "pass-card" : v==="fail" ? "fail-card" : v==="skip" ? "skip-card" : "");
-  render();
-  setTimeout(() => {
-    document.getElementById(`body-${i}`).classList.add("open");
-  }, 10);
-}
-
-function autoCheck(i) {
-  const ans = (answers[i] || "").toLowerCase();
-  if (!ans) { alert("먼저 답변을 붙여넣어 주세요."); return; }
-  const set = SETS[currentSet];
-  const kws = set.questions[i].keywords;
-  const found = kws.filter(k => ans.includes(k.toLowerCase())).length;
-  const ratio = found / kws.length;
-  const v = ratio >= 0.6 ? "pass" : "fail";
-  verdicts[i] = v;
-  render();
-  setTimeout(() => { document.getElementById(`body-${i}`).classList.add("open"); }, 10);
-}
-
-function autoCheckAll() {
-  const set = SETS[currentSet];
-  set.questions.forEach((q, i) => {
-    if (answers[i]) autoCheck(i);
-  });
-}
-
-function updateScore() {
-  const set = SETS[currentSet];
-  const total = set.questions.length;
-  const pass = Object.values(verdicts).filter(v=>v==="pass").length;
-  const fail = Object.values(verdicts).filter(v=>v==="fail").length;
-  const done = Object.values(verdicts).filter(v=>v!==undefined).length;
-  const judged = pass + fail;
-  const pct = judged > 0 ? Math.round(pass / judged * 100) : 0;
-
-  document.getElementById("sc-total").textContent = total;
-  document.getElementById("sc-pass").textContent = pass;
-  document.getElementById("sc-fail").textContent = fail;
-  document.getElementById("sc-pct").textContent = pct + "%";
-  document.getElementById("prog-label").textContent = `${done} / ${total} 완료`;
-  document.getElementById("prog-fill").style.width = Math.round(done/total*100) + "%";
-}
-
-function showResult() {
-  const set = SETS[currentSet];
-  const total = set.questions.length;
-  const pass = Object.values(verdicts).filter(v=>v==="pass").length;
-  const fail = Object.values(verdicts).filter(v=>v==="fail").length;
-  const skip = Object.values(verdicts).filter(v=>v==="skip").length;
-  const judged = pass + fail;
-  const pct = judged > 0 ? Math.round(pass / judged * 100) : 0;
-  const grade = pct >= 90 ? "🏆 우수" : pct >= 70 ? "✅ 양호" : pct >= 50 ? "⚠️ 보통" : "❌ 미흡";
-  const color = pct >= 90 ? "#375623" : pct >= 70 ? "#2E75B6" : pct >= 50 ? "#856404" : "#C00000";
-
-  document.getElementById("resultGrid").innerHTML = `
-    <div class="result-item"><div class="rn" style="color:var(--navy)">${total}</div><div class="rl">전체 문항</div></div>
-    <div class="result-item"><div class="rn" style="color:#375623">${pass}</div><div class="rl">합격 ✅</div></div>
-    <div class="result-item"><div class="rn" style="color:#C00000">${fail}</div><div class="rl">불합격 ❌</div></div>
-    <div class="result-item"><div class="rn" style="color:var(--orange)">${pct}%</div><div class="rl">합격률</div></div>`;
-  document.getElementById("resultFill").style.cssText = `width:${pct}%; background: linear-gradient(90deg, ${color}, ${color}aa);`;
-  document.getElementById("resultComment").textContent = `${grade} — ${judged}문항 평가 완료`;
-  document.getElementById("resultComment").style.color = color;
-
-  let detail = `[챗봇 성능 점검 결과] ${new Date().toLocaleDateString('ko-KR')}\n세트: ${set.name}\n${'─'.repeat(40)}\n`;
-  set.questions.forEach((q, i) => {
-    const v = verdicts[i] || "미평가";
-    const icon = v==="pass"?"✅":v==="fail"?"❌":v==="skip"?"⏭":"⬜";
-    detail += `${icon} Q${i+1}. ${q.q}\n   유형: ${q.type} | 판정: ${v}\n`;
-  });
-  detail += `${'─'.repeat(40)}\n합격: ${pass}  불합격: ${fail}  건너뜀: ${skip}\n합격률: ${pct}%  등급: ${grade}`;
-  document.getElementById("resultDetail").textContent = detail;
-  document.getElementById("exportContent").textContent = detail;
-  document.getElementById("resultModal").classList.add("open");
-}
-
-function openImport() { document.getElementById("importModal").classList.add("open"); }
-function openExport() {
-  showResult();
-  closeModal("resultModal");
-  document.getElementById("exportModal").classList.add("open");
-}
-function closeModal(id) { document.getElementById(id).classList.remove("open"); }
-
-function applyImport() {
-  try {
-    const data = JSON.parse(document.getElementById("importText").value);
-    if (!data.name || !data.questions) throw new Error("형식 오류");
-    const key = "imported_" + Date.now();
-    SETS[key] = data;
-    const sel = document.getElementById("setSelect");
-    const opt = document.createElement("option");
-    opt.value = key; opt.text = data.name; opt.selected = true;
-    sel.appendChild(opt);
-    closeModal("importModal");
-    loadSet(key);
-    alert(`"${data.name}" 세트가 등록되었습니다!`);
-  } catch(e) {
-    alert("JSON 형식을 확인해주세요: " + e.message);
+function selectAI(ai){
+  currentAI=ai;
+  document.querySelectorAll(".ai-tab").forEach(t=>t.classList.remove("active"));
+  document.querySelector(".tab-"+ai).classList.add("active");
+  const setup=document.getElementById("apiSetup");
+  const demo=document.getElementById("demoNotice");
+  if(ai==="demo"){
+    setup.style.display="none";
+    demo.style.display="block";
+  } else {
+    setup.style.display="block";
+    demo.style.display="none";
+    const cfg=AI_CONFIG[ai];
+    document.getElementById("apiKeyInput").placeholder=cfg.placeholder;
+    document.getElementById("apiKeyInput").value=savedKeys[ai]||"";
+    document.getElementById("apiHint").innerHTML=cfg.hint+" · 키는 브라우저에만 저장되며 외부로 전송되지 않습니다.";
   }
 }
 
-function copyExport() {
-  const txt = document.getElementById("exportContent").textContent || document.getElementById("resultDetail").textContent;
-  navigator.clipboard.writeText(txt).then(() => alert("복사되었습니다!"));
+function saveKey(){
+  const val=document.getElementById("apiKeyInput").value.trim();
+  if(!val){alert("API 키를 입력해주세요.");return}
+  savedKeys[currentAI]=val;
+  const btn=document.querySelector(".save-btn");
+  btn.textContent="저장됨 ✓";btn.style.background="#375623";
+  setTimeout(()=>{btn.textContent="저장";btn.style.background="#1a1a1a"},1500);
 }
 
-function resetAll() {
-  if (!confirm("모든 답변과 판정을 초기화할까요?")) return;
-  answers = {}; verdicts = {}; render();
+function setEx(el){document.getElementById("userInput").value=el.textContent}
+
+const SYS_PROMPT=`당신은 프롬프트 품질 전문가입니다.
+사용자가 입력한 짧은 질문을 받아, 아래 7가지 품질 요소를 모두 포함한 완성도 높은 프롬프트로 업그레이드해주세요.
+
+7가지 품질 요소:
+00. 전문성(Persona): 적절한 전문가 역할 부여
+01. 정확성(Accuracy): 사실 기반, 검증 가능한 정보 요청
+02. 일관성(Consistency): 일관된 형식과 기준 유지
+03. 완결성(Completeness): 필요한 모든 항목 포함
+04. 명료성(Clarity): 이해하기 쉬운 구조와 표현
+05. 관련성(Relevance): 질문 의도에 집중
+06. 실행가능성(Actionability): 즉시 현장에서 활용 가능
+
+반드시 아래 JSON 형식으로만 응답하세요. 마크다운 코드블록 없이 순수 JSON만:
+{
+  "elements": {
+    "persona": "역할 설정 내용",
+    "accuracy": "정확성 반영 내용",
+    "consistency": "일관성 반영 내용",
+    "completeness": "완결성 반영 내용",
+    "clarity": "명료성 반영 내용",
+    "relevance": "관련성 반영 내용",
+    "actionability": "실행가능성 반영 내용"
+  },
+  "prompt": "완성된 업그레이드 프롬프트 전문 (한국어, 400-600자)"
+}`;
+
+async function callClaude(input,key){
+  const r=await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01"},
+    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,system:SYS_PROMPT,messages:[{role:"user",content:input}]})
+  });
+  const d=await r.json();
+  if(d.error)throw new Error(d.error.message);
+  return d.content[0].text;
 }
 
-loadSet("qc");
+async function callGPT(input,key){
+  const r=await fetch("https://api.openai.com/v1/chat/completions",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+    body:JSON.stringify({model:"gpt-4o-mini",messages:[{role:"system",content:SYS_PROMPT},{role:"user",content:input}],max_tokens:1000})
+  });
+  const d=await r.json();
+  if(d.error)throw new Error(d.error.message);
+  return d.choices[0].message.content;
+}
+
+async function callGemini(input,key){
+  const prompt=SYS_PROMPT+"\n\n사용자 입력: "+input;
+  const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})
+  });
+  const d=await r.json();
+  if(d.error)throw new Error(d.error.message);
+  return d.candidates[0].content.parts[0].text;
+}
+
+function demoResult(input){
+  return JSON.stringify({
+    elements:{
+      persona:`${input}에 대한 전문가 역할을 설정합니다. 10년 이상의 실무 경험을 가진 해당 분야 전문가로서 답변합니다.`,
+      accuracy:"제공하는 모든 수치와 기준은 검증된 자료에 근거하며, 불확실한 내용은 명시합니다.",
+      consistency:"답변 전반에 걸쳐 동일한 용어와 기준을 일관되게 사용합니다.",
+      completeness:"요청한 모든 항목을 빠짐없이 포함하고, 관련된 부가 정보도 함께 제공합니다.",
+      clarity:"복잡한 내용은 단계별 번호 목록으로 구조화하여 이해하기 쉽게 제시합니다.",
+      relevance:"질문의 핵심 의도에 집중하며, 불필요한 내용은 최소화합니다.",
+      actionability:"답변을 받은 즉시 현장에서 적용할 수 있도록 구체적인 실행 방법을 포함합니다."
+    },
+    prompt:`[데모 예시] 다음은 "${input}" 질문을 7가지 품질 요소를 반영하여 업그레이드한 프롬프트입니다.\n\n당신은 해당 분야에서 10년 이상 경력을 가진 전문가입니다.\n\n요청사항: ${input}\n\n다음 사항을 모두 포함하여 답변해주세요:\n1. 핵심 원인 분석 (검증된 자료 기반)\n2. 단계별 실행 방법 (즉시 적용 가능하게)\n3. 주의사항 및 예외 케이스\n4. 예상 결과 및 효과\n\n답변은 번호 목록으로 구조화하고, 수치와 근거를 명시해주세요.\n\n※ 이것은 데모 모드 예시입니다. 실제 AI API 연결 시 더 정확한 결과를 얻을 수 있습니다.`
+  });
+}
+
+async function generate(){
+  const input=document.getElementById("userInput").value.trim();
+  if(!input){alert("질문을 입력해주세요.");return}
+
+  const key=savedKeys[currentAI]||document.getElementById("apiKeyInput")?.value?.trim()||"";
+  if(currentAI!=="demo"&&!key){
+    alert("API 키를 먼저 입력하고 저장해주세요.");
+    document.getElementById("apiKeyInput").focus();
+    return;
+  }
+
+  document.getElementById("genBtn").disabled=true;
+  document.getElementById("loading").style.display="block";
+  document.getElementById("resultWrap").style.display="none";
+  document.getElementById("errorBox").style.display="none";
+
+  const msgs={claude:"Claude가 분석하는 중...",gpt:"ChatGPT가 분석하는 중...",gemini:"Gemini가 분석하는 중...",demo:"데모 결과 생성 중..."};
+  document.getElementById("loadingMsg").textContent=msgs[currentAI];
+
+  try{
+    let raw;
+    if(currentAI==="claude") raw=await callClaude(input,key);
+    else if(currentAI==="gpt") raw=await callGPT(input,key);
+    else if(currentAI==="gemini") raw=await callGemini(input,key);
+    else { await new Promise(r=>setTimeout(r,1200)); raw=demoResult(input); }
+
+    const clean=raw.trim().replace(/```json|```/g,"").trim();
+    const parsed=JSON.parse(clean);
+    renderResult(parsed,currentAI);
+  }catch(e){
+    const eb=document.getElementById("errorBox");
+    eb.style.display="block";
+    eb.innerHTML="⚠️ "+e.message+"<br><small>API 키와 네트워크 상태를 확인해주세요. CORS 오류 시 해당 AI 공식 사이트에서 키 권한을 확인하세요.</small>";
+  }finally{
+    document.getElementById("loading").style.display="none";
+    document.getElementById("genBtn").disabled=false;
+  }
+}
+
+const AI_COLORS={claude:"#D97706",gpt:"#10A37F",gemini:"#4285F4",demo:"#7C3AED"};
+
+function renderResult(data,ai){
+  const color=AI_COLORS[ai]||"#F5C518";
+  const grid=document.getElementById("elemGrid");
+  grid.innerHTML="";
+  ELEMENTS.forEach(el=>{
+    const c=data.elements[el.key]||"-";
+    grid.innerHTML+=`<div class="elem-card" style="border-top-color:${color}">
+      <div class="elem-num" style="color:${color}">${el.num} · ${el.desc.toUpperCase()}</div>
+      <div class="elem-name">${el.name}</div>
+      <div class="elem-body">${c}</div>
+    </div>`;
+  });
+  document.getElementById("promptText").textContent=data.prompt;
+  document.getElementById("resultWrap").style.display="block";
+  document.getElementById("resultWrap").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function copyPrompt(){
+  const t=document.getElementById("promptText").textContent;
+  navigator.clipboard.writeText(t).then(()=>alert("복사 완료!\nClaude, ChatGPT, Gemini에 바로 붙여넣으세요."));
+}
+
+function resetAll(){
+  document.getElementById("userInput").value="";
+  document.getElementById("resultWrap").style.display="none";
+  document.getElementById("errorBox").style.display="none";
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+document.getElementById("userInput").addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();generate()}
+});
+
+selectAI("claude");
 </script>
 </body>
 </html>

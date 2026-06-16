@@ -4,102 +4,386 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>프롬프트 업그레이더</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:#F8F8F6;color:#111;min-height:100vh}
-.wrap{max-width:800px;margin:0 auto;padding:28px 16px 40px}
 
-.hero{background:#1a1a1a;border-radius:14px;padding:28px 28px 22px;margin-bottom:18px}
-.hero-badge{background:#F5C518;color:#1a1a1a;font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px;letter-spacing:.5px;display:inline-block;margin-bottom:10px}
-.hero h1{font-size:24px;font-weight:800;color:white;letter-spacing:-.5px}
-.hero p{font-size:13px;color:#888;margin-top:5px}
-.hero-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
-.htag{background:rgba(245,197,24,.12);color:#F5C518;border:1px solid rgba(245,197,24,.2);border-radius:5px;padding:2px 9px;font-size:11px;font-weight:700}
+:root{
+  --black:#0D0D0D;
+  --white:#FAFAF7;
+  --gray1:#F0EEE9;
+  --gray2:#D9D6CE;
+  --gray3:#9E9B94;
+  --border:2.5px solid #0D0D0D;
+  --shadow:4px 4px 0 #0D0D0D;
+  --shadow-sm:3px 3px 0 #0D0D0D;
+  --radius:10px;
+}
 
-.card{background:white;border-radius:12px;border:1px solid #E5E5E5;padding:20px;margin-bottom:14px}
-.section-label{font-size:11px;font-weight:800;color:#AAA;letter-spacing:.4px;text-transform:uppercase;margin-bottom:10px}
+body{
+  font-family:'Noto Sans KR','Malgun Gothic',sans-serif;
+  background:var(--white);
+  color:var(--black);
+  min-height:100vh;
+  background-image: radial-gradient(circle, #D9D6CE 1px, transparent 1px);
+  background-size: 24px 24px;
+}
 
-.ai-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:0}
-.ai-tab{border:1.5px solid #E5E5E5;border-radius:8px;padding:10px 8px;text-align:center;cursor:pointer;transition:all .15s;background:white}
-.ai-tab:hover{border-color:#CCC;background:#FAFAFA}
-.ai-tab.active{border-width:2px}
-.ai-tab .ai-icon{font-size:20px;margin-bottom:4px}
-.ai-tab .ai-name{font-size:12px;font-weight:800;display:block}
-.ai-tab .ai-sub{font-size:10px;color:#AAA;display:block;margin-top:1px}
+.wrap{max-width:820px;margin:0 auto;padding:36px 20px 60px}
 
-.tab-claude.active{border-color:#D97706;background:#FFFBEB}
-.tab-claude .ai-name{color:#D97706}
-.tab-gpt.active{border-color:#10A37F;background:#F0FDF8}
-.tab-gpt .ai-name{color:#10A37F}
-.tab-gemini.active{border-color:#4285F4;background:#EFF6FF}
-.tab-gemini .ai-name{color:#4285F4}
-.tab-demo.active{border-color:#7C3AED;background:#F5F3FF}
-.tab-demo .ai-name{color:#7C3AED}
+/* ── HERO ── */
+.hero{
+  background:var(--black);
+  border-radius:var(--radius);
+  border:var(--border);
+  box-shadow:var(--shadow);
+  padding:32px 32px 28px;
+  margin-bottom:24px;
+  position:relative;
+  overflow:hidden;
+}
+.hero::before{
+  content:'';
+  position:absolute;top:-30px;right:-30px;
+  width:160px;height:160px;
+  background:rgba(255,255,255,.04);
+  border-radius:50%;
+}
+.hero::after{
+  content:'UPGRADE';
+  position:absolute;bottom:-8px;right:20px;
+  font-size:80px;font-weight:900;
+  color:rgba(255,255,255,.04);
+  letter-spacing:-3px;
+  pointer-events:none;
+}
+.hero-badge{
+  display:inline-block;
+  background:var(--white);
+  color:var(--black);
+  font-size:11px;font-weight:900;
+  padding:4px 12px;
+  border-radius:99px;
+  border:2px solid var(--white);
+  letter-spacing:.8px;
+  margin-bottom:14px;
+}
+.hero h1{
+  font-size:32px;font-weight:900;
+  color:var(--white);
+  letter-spacing:-1px;
+  line-height:1.2;
+}
+.hero p{font-size:13px;color:var(--gray3);margin-top:6px}
+.hero-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}
+.htag{
+  background:transparent;
+  color:var(--gray2);
+  border:1.5px solid rgba(255,255,255,.2);
+  border-radius:5px;
+  padding:3px 10px;
+  font-size:11px;font-weight:700;
+  letter-spacing:.3px;
+}
 
-.api-setup{margin-top:14px;padding-top:14px;border-top:1px solid #F0F0F0}
-.api-row{display:flex;gap:8px;align-items:center}
-.api-input{flex:1;border:1.5px solid #E0E0E0;border-radius:7px;padding:9px 12px;font-size:13px;font-family:monospace;outline:none;transition:border .15s;color:#333}
-.api-input:focus{border-color:#F5C518}
-.api-input::placeholder{color:#CCC;font-family:'Malgun Gothic',sans-serif;font-size:12px}
-.save-btn{background:#1a1a1a;color:white;border:none;border-radius:7px;padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
-.save-btn:hover{background:#333}
-.api-hint{font-size:11px;color:#AAA;margin-top:7px;line-height:1.6}
-.api-hint a{color:#4285F4;text-decoration:none}
-.api-hint a:hover{text-decoration:underline}
+/* ── CARD ── */
+.card{
+  background:var(--white);
+  border-radius:var(--radius);
+  border:var(--border);
+  box-shadow:var(--shadow);
+  padding:22px;
+  margin-bottom:20px;
+}
+.sec-label{
+  font-size:10px;font-weight:900;
+  color:var(--gray3);
+  letter-spacing:1px;
+  text-transform:uppercase;
+  margin-bottom:14px;
+  display:flex;align-items:center;gap:6px;
+}
+.sec-label::after{content:'';flex:1;height:1.5px;background:var(--gray2)}
 
-.demo-notice{background:#F5F3FF;border:1px solid #DDD6FE;border-radius:8px;padding:12px 14px;font-size:12px;color:#5B21B6;margin-top:14px;line-height:1.6;display:none}
+/* ── AI TABS ── */
+.ai-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.ai-tab{
+  border:var(--border);
+  border-radius:var(--radius);
+  padding:14px 8px;
+  text-align:center;
+  cursor:pointer;
+  transition:all .12s;
+  background:var(--white);
+  position:relative;
+}
+.ai-tab:hover{background:var(--gray1);transform:translate(-1px,-1px);box-shadow:var(--shadow)}
+.ai-tab.active{
+  background:var(--black);
+  transform:translate(-2px,-2px);
+  box-shadow:6px 6px 0 var(--gray2);
+}
+.ai-tab.active .ai-name{color:var(--white)}
+.ai-tab.active .ai-sub{color:var(--gray3)}
+.ai-icon{font-size:22px;margin-bottom:5px;display:block}
+.ai-name{font-size:13px;font-weight:900;display:block;color:var(--black)}
+.ai-sub{font-size:10px;color:var(--gray3);display:block;margin-top:2px}
 
-.input-area{margin-top:14px;padding-top:14px;border-top:1px solid #F0F0F0}
+/* ── API SETUP ── */
+.api-setup{margin-top:18px;padding-top:18px;border-top:1.5px solid var(--gray2)}
+.api-row{display:flex;gap:8px}
+.api-input{
+  flex:1;
+  border:var(--border);
+  border-radius:8px;
+  padding:10px 14px;
+  font-size:13px;
+  font-family:monospace;
+  outline:none;
+  background:var(--gray1);
+  color:var(--black);
+  transition:all .12s;
+}
+.api-input:focus{background:var(--white);box-shadow:inset 2px 2px 0 var(--black)}
+.api-input::placeholder{font-family:'Noto Sans KR',sans-serif;font-size:12px;color:var(--gray3)}
+.save-btn{
+  background:var(--black);color:var(--white);
+  border:var(--border);border-radius:8px;
+  padding:10px 18px;font-size:13px;font-weight:900;
+  cursor:pointer;white-space:nowrap;
+  transition:all .12s;
+  box-shadow:var(--shadow-sm);
+}
+.save-btn:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--gray2)}
+.save-btn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--black)}
+.api-hint{font-size:11px;color:var(--gray3);margin-top:8px;line-height:1.7}
+.api-hint a{color:var(--black);font-weight:700;text-decoration:underline}
+
+.demo-notice{
+  background:var(--gray1);
+  border:var(--border);
+  border-radius:8px;
+  padding:12px 16px;
+  font-size:12px;
+  color:var(--black);
+  margin-top:18px;
+  line-height:1.7;
+  display:none;
+}
+.demo-notice strong{font-weight:900}
+
+/* ── INPUT ── */
+.input-area{margin-top:18px;padding-top:18px;border-top:1.5px solid var(--gray2)}
 .input-row{display:flex;gap:10px;align-items:flex-end}
-.main-input{flex:1;border:1.5px solid #E0E0E0;border-radius:8px;padding:12px 14px;font-size:14px;font-family:inherit;outline:none;transition:border .15s;resize:none;min-height:54px;line-height:1.6}
-.main-input:focus{border-color:#F5C518}
-.main-input::placeholder{color:#CCC}
-.gen-btn{background:#F5C518;color:#1a1a1a;border:none;border-radius:8px;padding:12px 20px;font-size:14px;font-weight:800;cursor:pointer;transition:all .15s;white-space:nowrap;min-height:54px;min-width:110px}
-.gen-btn:hover{background:#e0b010}
-.gen-btn:disabled{background:#DDD;color:#999;cursor:not-allowed}
+.main-input{
+  flex:1;
+  border:var(--border);
+  border-radius:8px;
+  padding:14px 16px;
+  font-size:15px;
+  font-family:'Noto Sans KR',sans-serif;
+  font-weight:700;
+  outline:none;
+  resize:none;
+  min-height:58px;
+  line-height:1.6;
+  background:var(--gray1);
+  color:var(--black);
+  transition:all .12s;
+}
+.main-input:focus{background:var(--white);box-shadow:inset 2px 2px 0 var(--black)}
+.main-input::placeholder{color:var(--gray3);font-weight:400}
+.gen-btn{
+  background:var(--black);color:var(--white);
+  border:var(--border);border-radius:8px;
+  padding:14px 22px;
+  font-size:14px;font-weight:900;
+  cursor:pointer;
+  min-height:58px;min-width:120px;
+  white-space:nowrap;
+  transition:all .12s;
+  box-shadow:var(--shadow);
+  letter-spacing:-.3px;
+}
+.gen-btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--gray2)}
+.gen-btn:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--black)}
+.gen-btn:disabled{background:var(--gray2);color:var(--gray3);cursor:not-allowed;transform:none;box-shadow:var(--shadow-sm)}
 
-.examples{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;align-items:center}
-.ex-lbl{font-size:11px;color:#AAA}
-.ex-tag{background:#F5F5F5;border:1px solid #E5E5E5;border-radius:6px;padding:4px 10px;font-size:12px;color:#555;cursor:pointer;transition:all .15s}
-.ex-tag:hover{background:#FFF8DC;border-color:#F5C518;color:#1a1a1a}
+.examples{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px;align-items:center}
+.ex-lbl{font-size:11px;color:var(--gray3);font-weight:700}
+.ex-tag{
+  background:var(--white);
+  border:var(--border);
+  border-radius:6px;
+  padding:4px 12px;
+  font-size:12px;font-weight:700;
+  color:var(--black);
+  cursor:pointer;
+  transition:all .12s;
+  box-shadow:2px 2px 0 var(--black);
+}
+.ex-tag:hover{background:var(--black);color:var(--white);transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--gray2)}
 
-.error-box{background:#FFF0F0;border:1px solid #FFBBBB;border-radius:7px;padding:12px 14px;font-size:13px;color:#C00;margin-top:12px;line-height:1.6;display:none}
+.error-box{
+  background:#FFF0F0;
+  border:2px solid #C00;
+  border-radius:8px;
+  padding:12px 16px;
+  font-size:13px;font-weight:700;
+  color:#C00;
+  margin-top:12px;
+  line-height:1.6;
+  display:none;
+  box-shadow:3px 3px 0 #C00;
+}
 
-.loading{text-align:center;padding:36px;display:none}
-.spin{width:34px;height:34px;border:3px solid #EEE;border-top-color:#F5C518;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 10px}
+/* ── LOADING ── */
+.loading{text-align:center;padding:44px;display:none}
+.spin-wrap{width:40px;height:40px;margin:0 auto 14px;position:relative}
+.spin{
+  width:40px;height:40px;
+  border:3px solid var(--gray2);
+  border-top-color:var(--black);
+  border-radius:50%;
+  animation:spin .6s linear infinite;
+}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading p{font-size:13px;color:#888}
+.loading p{font-size:13px;font-weight:700;color:var(--gray3)}
 
+/* ── RESULT ── */
 .result-wrap{display:none}
+.result-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;flex-wrap:wrap;gap:8px;
+}
+.result-title{font-size:16px;font-weight:900;letter-spacing:-.3px}
+.result-ai-badge{
+  background:var(--black);color:var(--white);
+  border-radius:6px;border:var(--border);
+  padding:4px 12px;font-size:11px;font-weight:900;
+  box-shadow:var(--shadow-sm);
+}
 
-.elem-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:14px}
-.elem-card{background:white;border-radius:10px;border:1px solid #E5E5E5;padding:14px;border-top:3px solid #F5C518}
-.elem-num{font-size:10px;font-weight:800;color:#F5C518;letter-spacing:.4px;margin-bottom:2px}
-.elem-name{font-size:13px;font-weight:700;color:#111;margin-bottom:5px}
-.elem-body{font-size:12px;color:#555;line-height:1.6}
+.elem-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(195px,1fr));
+  gap:12px;
+  margin-bottom:20px;
+}
+.elem-card{
+  background:var(--white);
+  border:var(--border);
+  border-radius:var(--radius);
+  padding:14px 16px;
+  box-shadow:var(--shadow-sm);
+  transition:all .12s;
+  position:relative;
+  overflow:hidden;
+}
+.elem-card::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;
+  height:4px;
+  background:var(--black);
+}
+.elem-card:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--black)}
+.elem-num{
+  font-size:10px;font-weight:900;
+  letter-spacing:.6px;
+  margin-bottom:3px;
+  color:var(--gray3);
+}
+.elem-name{font-size:13px;font-weight:900;color:var(--black);margin-bottom:6px}
+.elem-body{font-size:12px;color:#555;line-height:1.65}
 
-.prompt-out{background:#1a1a1a;border-radius:12px;padding:20px 22px;margin-bottom:14px}
-.prompt-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.prompt-lbl{font-size:11px;font-weight:800;color:#F5C518;letter-spacing:.4px}
-.copy-btn{background:rgba(245,197,24,.15);color:#F5C518;border:1px solid rgba(245,197,24,.25);border-radius:6px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s}
-.copy-btn:hover{background:rgba(245,197,24,.3)}
-.prompt-text{font-size:13px;color:#E0E0E0;line-height:1.9;white-space:pre-wrap;font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif}
+.prompt-out{
+  background:var(--black);
+  border-radius:var(--radius);
+  border:var(--border);
+  box-shadow:var(--shadow);
+  padding:22px 24px;
+  margin-bottom:18px;
+}
+.prompt-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.prompt-lbl{
+  font-size:11px;font-weight:900;
+  color:var(--white);
+  letter-spacing:.6px;
+  display:flex;align-items:center;gap:6px;
+}
+.prompt-lbl::before{
+  content:'';
+  display:inline-block;
+  width:8px;height:8px;
+  background:var(--white);
+  border-radius:50%;
+}
+.copy-btn{
+  background:var(--white);color:var(--black);
+  border:2px solid var(--white);
+  border-radius:6px;
+  padding:5px 14px;
+  font-size:11px;font-weight:900;
+  cursor:pointer;
+  transition:all .12s;
+  letter-spacing:.3px;
+}
+.copy-btn:hover{background:var(--gray2);border-color:var(--gray2)}
+.prompt-text{
+  font-size:13px;
+  color:#D9D9D9;
+  line-height:1.9;
+  white-space:pre-wrap;
+  font-family:'Noto Sans KR',sans-serif;
+}
 
-.action-row{display:flex;gap:8px;justify-content:center}
-.reset-btn{background:white;border:1.5px solid #E5E5E5;border-radius:8px;padding:10px 22px;font-size:13px;font-weight:700;color:#555;cursor:pointer;transition:all .15s}
-.reset-btn:hover{border-color:#F5C518;color:#1a1a1a}
-.use-btn{background:#1a1a1a;color:#F5C518;border:none;border-radius:8px;padding:10px 22px;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
-.use-btn:hover{background:#333}
+.action-row{display:flex;gap:10px;justify-content:center}
+.reset-btn{
+  background:var(--white);color:var(--black);
+  border:var(--border);border-radius:8px;
+  padding:12px 26px;font-size:13px;font-weight:900;
+  cursor:pointer;
+  box-shadow:var(--shadow-sm);
+  transition:all .12s;
+}
+.reset-btn:hover{background:var(--gray1);transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--black)}
+.use-btn{
+  background:var(--black);color:var(--white);
+  border:var(--border);border-radius:8px;
+  padding:12px 26px;font-size:13px;font-weight:900;
+  cursor:pointer;
+  box-shadow:var(--shadow);
+  transition:all .12s;
+}
+.use-btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--gray2)}
 
-.footer{text-align:center;font-size:11px;color:#BBB;margin-top:20px}
+.footer{
+  text-align:center;
+  font-size:11px;
+  color:var(--gray3);
+  margin-top:24px;
+  font-weight:700;
+  letter-spacing:.3px;
+}
+
+@media(max-width:600px){
+  .hero{padding:22px 18px 20px}
+  .hero h1{font-size:24px}
+  .ai-tabs{grid-template-columns:repeat(2,1fr)}
+  .gen-btn{min-width:90px;padding:14px 14px;font-size:13px}
+  .action-row{flex-direction:column}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <div class="hero">
-    <div class="hero-badge">PROMPT UPGRADER v2</div>
-    <h1>프롬프트 업그레이더</h1>
+    <div class="hero-badge">PROMPT UPGRADER v3</div>
+    <h1>프롬프트<br>업그레이더</h1>
     <p>한 줄 질문 → 7가지 품질 요소가 완벽하게 담긴 프롬프트로 변환</p>
     <div class="hero-tags">
       <span class="htag">00 전문성</span>
@@ -113,26 +397,26 @@ body{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:#F8
   </div>
 
   <div class="card">
-    <div class="section-label">AI 선택 및 API 키 설정</div>
+    <div class="sec-label">AI 선택 및 API 키 설정</div>
 
     <div class="ai-tabs">
-      <div class="ai-tab tab-claude active" onclick="selectAI('claude')">
-        <div class="ai-icon">🟠</div>
+      <div class="ai-tab active" id="tab-claude" onclick="selectAI('claude')">
+        <span class="ai-icon">🟠</span>
         <span class="ai-name">Claude</span>
         <span class="ai-sub">Anthropic</span>
       </div>
-      <div class="ai-tab tab-gpt" onclick="selectAI('gpt')">
-        <div class="ai-icon">🟢</div>
+      <div class="ai-tab" id="tab-gpt" onclick="selectAI('gpt')">
+        <span class="ai-icon">🟢</span>
         <span class="ai-name">ChatGPT</span>
         <span class="ai-sub">OpenAI</span>
       </div>
-      <div class="ai-tab tab-gemini" onclick="selectAI('gemini')">
-        <div class="ai-icon">🔵</div>
+      <div class="ai-tab" id="tab-gemini" onclick="selectAI('gemini')">
+        <span class="ai-icon">🔵</span>
         <span class="ai-name">Gemini</span>
         <span class="ai-sub">Google</span>
       </div>
-      <div class="ai-tab tab-demo" onclick="selectAI('demo')">
-        <div class="ai-icon">🟣</div>
+      <div class="ai-tab" id="tab-demo" onclick="selectAI('demo')">
+        <span class="ai-icon">🟣</span>
         <span class="ai-name">데모 모드</span>
         <span class="ai-sub">API 없이 테스트</span>
       </div>
@@ -140,22 +424,27 @@ body{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:#F8
 
     <div class="api-setup" id="apiSetup">
       <div class="api-row">
-        <input class="api-input" type="password" id="apiKeyInput" placeholder="API 키를 입력하세요 (sk-ant-...)" />
-        <button class="save-btn" onclick="saveKey()">저장</button>
+        <input class="api-input" type="password" id="apiKeyInput"
+          placeholder="sk-ant-api... (Anthropic Console에서 발급)" />
+        <button class="save-btn" id="saveBtn" onclick="saveKey()">저장</button>
       </div>
       <div class="api-hint" id="apiHint">
-        Claude API 키 발급: <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> · 키는 브라우저에만 저장되며 외부로 전송되지 않습니다.
+        Claude API 키 발급:
+        <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>
+        · 키는 브라우저에만 저장되며 외부로 전송되지 않습니다.
       </div>
     </div>
 
     <div class="demo-notice" id="demoNotice">
-      🟣 <strong>데모 모드</strong> — API 키 없이 7가지 요소 구조를 미리 체험할 수 있습니다. 실제 AI 생성 결과가 아닌 예시 답변이 표시됩니다.
+      <strong>데모 모드</strong> — API 키 없이 7가지 요소 구조를 미리 체험할 수 있습니다.
+      실제 AI 생성 결과가 아닌 예시 답변이 표시됩니다.
     </div>
 
     <div class="input-area">
-      <div class="section-label">질문 입력</div>
+      <div class="sec-label">질문 입력</div>
       <div class="input-row">
-        <textarea class="main-input" id="userInput" placeholder="예) 사출 공정 불량률이 갑자기 올라갔어" rows="2"></textarea>
+        <textarea class="main-input" id="userInput"
+          placeholder="예) 사출 공정 불량률이 갑자기 올라갔어" rows="2"></textarea>
         <button class="gen-btn" id="genBtn" onclick="generate()">업그레이드 ↗</button>
       </div>
       <div class="examples">
@@ -163,7 +452,7 @@ body{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:#F8
         <span class="ex-tag" onclick="setEx(this)">불량률 계산해줘</span>
         <span class="ex-tag" onclick="setEx(this)">클레임 들어왔어</span>
         <span class="ex-tag" onclick="setEx(this)">수입 검사 방법</span>
-        <span class="ex-tag" onclick="setEx(this)">마케팅 전략 알려줘</span>
+        <span class="ex-tag" onclick="setEx(this)">마케팅 전략</span>
         <span class="ex-tag" onclick="setEx(this)">이메일 써줘</span>
         <span class="ex-tag" onclick="setEx(this)">보고서 형식</span>
       </div>
@@ -172,62 +461,73 @@ body{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:#F8
   </div>
 
   <div class="loading" id="loading">
-    <div class="spin"></div>
-    <p id="loadingMsg">7가지 품질 요소를 분석하고 프롬프트를 생성하는 중...</p>
+    <div class="spin-wrap"><div class="spin"></div></div>
+    <p id="loadingMsg">7가지 품질 요소를 분석하는 중...</p>
   </div>
 
   <div class="result-wrap" id="resultWrap">
-    <div class="elem-grid" id="elemGrid"></div>
+    <div class="card">
+      <div class="result-header">
+        <div class="result-title">7가지 품질 요소 분석 결과</div>
+        <div class="result-ai-badge" id="resultAiBadge">Claude</div>
+      </div>
+      <div class="elem-grid" id="elemGrid"></div>
+    </div>
+
     <div class="prompt-out">
       <div class="prompt-hd">
-        <span class="prompt-lbl">✦ 업그레이드된 프롬프트</span>
-        <button class="copy-btn" onclick="copyPrompt()">복사</button>
+        <span class="prompt-lbl">업그레이드된 프롬프트</span>
+        <button class="copy-btn" onclick="copyPrompt()">복사하기</button>
       </div>
       <div class="prompt-text" id="promptText"></div>
     </div>
+
     <div class="action-row">
-      <button class="reset-btn" onclick="resetAll()">새 질문 입력</button>
+      <button class="reset-btn" onclick="resetAll()">← 새 질문 입력</button>
       <button class="use-btn" onclick="copyPrompt()">프롬프트 복사 후 사용 ↗</button>
     </div>
   </div>
 
-  <div class="footer">Powered by AI API · 셰익스컴퍼니 · 키는 브라우저에만 저장됩니다</div>
+  <div class="footer">PROMPT UPGRADER v3 · 셰익스컴퍼니 · Powered by AI API</div>
 </div>
 
 <script>
 const ELEMENTS=[
-  {key:"persona",num:"00",name:"전문성 (Persona)",desc:"역할 설정"},
-  {key:"accuracy",num:"01",name:"정확성 (Accuracy)",desc:"사실 기반"},
-  {key:"consistency",num:"02",name:"일관성 (Consistency)",desc:"모순 없는 답변"},
-  {key:"completeness",num:"03",name:"완결성 (Completeness)",desc:"빠짐없는 항목"},
-  {key:"clarity",num:"04",name:"명료성 (Clarity)",desc:"이해하기 쉽게"},
-  {key:"relevance",num:"05",name:"관련성 (Relevance)",desc:"요청에 집중"},
-  {key:"actionability",num:"06",name:"실행가능성 (Actionability)",desc:"즉시 적용 가능"},
+  {key:"persona",  num:"00",name:"전문성 (Persona)",  desc:"PERSONA"},
+  {key:"accuracy", num:"01",name:"정확성 (Accuracy)", desc:"ACCURACY"},
+  {key:"consistency",num:"02",name:"일관성 (Consistency)",desc:"CONSISTENCY"},
+  {key:"completeness",num:"03",name:"완결성 (Completeness)",desc:"COMPLETENESS"},
+  {key:"clarity",  num:"04",name:"명료성 (Clarity)",  desc:"CLARITY"},
+  {key:"relevance",num:"05",name:"관련성 (Relevance)",desc:"RELEVANCE"},
+  {key:"actionability",num:"06",name:"실행가능성 (Actionability)",desc:"ACTIONABILITY"},
 ];
 
-const AI_CONFIG={
+const AI_CFG={
   claude:{
-    name:"Claude",placeholder:"sk-ant-api... (Anthropic Console에서 발급)",
-    hint:'Claude API 키 발급: <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>'
+    label:"Claude · Anthropic",
+    placeholder:"sk-ant-api... (Anthropic Console에서 발급)",
+    hint:'Claude API 키 발급: <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> · 키는 브라우저에만 저장됩니다.'
   },
   gpt:{
-    name:"ChatGPT",placeholder:"sk-... (OpenAI Platform에서 발급)",
-    hint:'OpenAI API 키 발급: <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a>'
+    label:"ChatGPT · OpenAI",
+    placeholder:"sk-... (OpenAI Platform에서 발급)",
+    hint:'OpenAI API 키 발급: <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a> · 키는 브라우저에만 저장됩니다.'
   },
   gemini:{
-    name:"Gemini",placeholder:"AIza... (Google AI Studio에서 발급)",
-    hint:'Gemini API 키 발급: <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a>'
+    label:"Gemini · Google",
+    placeholder:"AIza... (Google AI Studio에서 발급)",
+    hint:'Gemini API 키 발급: <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a> · 키는 브라우저에만 저장됩니다.'
   },
-  demo:{name:"데모 모드",placeholder:"",hint:""}
+  demo:{label:"데모 모드",placeholder:"",hint:""}
 };
 
-let currentAI="claude";
-let savedKeys={claude:"",gpt:"",gemini:""};
+let cur="claude";
+const keys={claude:"",gpt:"",gemini:""};
 
 function selectAI(ai){
-  currentAI=ai;
+  cur=ai;
   document.querySelectorAll(".ai-tab").forEach(t=>t.classList.remove("active"));
-  document.querySelector(".tab-"+ai).classList.add("active");
+  document.getElementById("tab-"+ai).classList.add("active");
   const setup=document.getElementById("apiSetup");
   const demo=document.getElementById("demoNotice");
   if(ai==="demo"){
@@ -236,25 +536,25 @@ function selectAI(ai){
   } else {
     setup.style.display="block";
     demo.style.display="none";
-    const cfg=AI_CONFIG[ai];
-    document.getElementById("apiKeyInput").placeholder=cfg.placeholder;
-    document.getElementById("apiKeyInput").value=savedKeys[ai]||"";
-    document.getElementById("apiHint").innerHTML=cfg.hint+" · 키는 브라우저에만 저장되며 외부로 전송되지 않습니다.";
+    const c=AI_CFG[ai];
+    document.getElementById("apiKeyInput").placeholder=c.placeholder;
+    document.getElementById("apiKeyInput").value=keys[ai]||"";
+    document.getElementById("apiHint").innerHTML=c.hint;
   }
 }
 
 function saveKey(){
-  const val=document.getElementById("apiKeyInput").value.trim();
-  if(!val){alert("API 키를 입력해주세요.");return}
-  savedKeys[currentAI]=val;
-  const btn=document.querySelector(".save-btn");
+  const v=document.getElementById("apiKeyInput").value.trim();
+  if(!v){alert("API 키를 입력해주세요.");return}
+  keys[cur]=v;
+  const btn=document.getElementById("saveBtn");
   btn.textContent="저장됨 ✓";btn.style.background="#375623";
-  setTimeout(()=>{btn.textContent="저장";btn.style.background="#1a1a1a"},1500);
+  setTimeout(()=>{btn.textContent="저장";btn.style.background="var(--black)"},1800);
 }
 
 function setEx(el){document.getElementById("userInput").value=el.textContent}
 
-const SYS_PROMPT=`당신은 프롬프트 품질 전문가입니다.
+const SYS=`당신은 프롬프트 품질 전문가입니다.
 사용자가 입력한 짧은 질문을 받아, 아래 7가지 품질 요소를 모두 포함한 완성도 높은 프롬프트로 업그레이드해주세요.
 
 7가지 품질 요소:
@@ -269,7 +569,7 @@ const SYS_PROMPT=`당신은 프롬프트 품질 전문가입니다.
 반드시 아래 JSON 형식으로만 응답하세요. 마크다운 코드블록 없이 순수 JSON만:
 {
   "elements": {
-    "persona": "역할 설정 내용",
+    "persona": "역할 설정 내용 (1-2문장)",
     "accuracy": "정확성 반영 내용",
     "consistency": "일관성 반영 내용",
     "completeness": "완결성 반영 내용",
@@ -283,8 +583,18 @@ const SYS_PROMPT=`당신은 프롬프트 품질 전문가입니다.
 async function callClaude(input,key){
   const r=await fetch("https://api.anthropic.com/v1/messages",{
     method:"POST",
-    headers:{"Content-Type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01"},
-    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,system:SYS_PROMPT,messages:[{role:"user",content:input}]})
+    headers:{
+      "Content-Type":"application/json",
+      "x-api-key":key,
+      "anthropic-version":"2023-06-01",
+      "anthropic-dangerous-direct-browser-access":"true"
+    },
+    body:JSON.stringify({
+      model:"claude-sonnet-4-6",
+      max_tokens:1000,
+      system:SYS,
+      messages:[{role:"user",content:input}]
+    })
   });
   const d=await r.json();
   if(d.error)throw new Error(d.error.message);
@@ -295,7 +605,11 @@ async function callGPT(input,key){
   const r=await fetch("https://api.openai.com/v1/chat/completions",{
     method:"POST",
     headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
-    body:JSON.stringify({model:"gpt-4o-mini",messages:[{role:"system",content:SYS_PROMPT},{role:"user",content:input}],max_tokens:1000})
+    body:JSON.stringify({
+      model:"gpt-4o-mini",
+      messages:[{role:"system",content:SYS},{role:"user",content:input}],
+      max_tokens:1000
+    })
   });
   const d=await r.json();
   if(d.error)throw new Error(d.error.message);
@@ -303,12 +617,14 @@ async function callGPT(input,key){
 }
 
 async function callGemini(input,key){
-  const prompt=SYS_PROMPT+"\n\n사용자 입력: "+input;
-  const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})
-  });
+  const r=await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
+    {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({contents:[{parts:[{text:SYS+"\n\n사용자 입력: "+input}]}]})
+    }
+  );
   const d=await r.json();
   if(d.error)throw new Error(d.error.message);
   return d.candidates[0].content.parts[0].text;
@@ -317,67 +633,62 @@ async function callGemini(input,key){
 function demoResult(input){
   return JSON.stringify({
     elements:{
-      persona:`${input}에 대한 전문가 역할을 설정합니다. 10년 이상의 실무 경험을 가진 해당 분야 전문가로서 답변합니다.`,
-      accuracy:"제공하는 모든 수치와 기준은 검증된 자료에 근거하며, 불확실한 내용은 명시합니다.",
+      persona:`"${input}"에 답하기 위해 해당 분야 10년 이상 경력의 전문가 역할을 설정합니다.`,
+      accuracy:"제공하는 수치와 기준은 검증된 자료에 근거하며, 불확실한 내용은 명시합니다.",
       consistency:"답변 전반에 걸쳐 동일한 용어와 기준을 일관되게 사용합니다.",
-      completeness:"요청한 모든 항목을 빠짐없이 포함하고, 관련된 부가 정보도 함께 제공합니다.",
+      completeness:"요청한 모든 항목을 빠짐없이 포함하고 관련 부가 정보도 제공합니다.",
       clarity:"복잡한 내용은 단계별 번호 목록으로 구조화하여 이해하기 쉽게 제시합니다.",
-      relevance:"질문의 핵심 의도에 집중하며, 불필요한 내용은 최소화합니다.",
+      relevance:"질문의 핵심 의도에 집중하며 불필요한 내용은 최소화합니다.",
       actionability:"답변을 받은 즉시 현장에서 적용할 수 있도록 구체적인 실행 방법을 포함합니다."
     },
-    prompt:`[데모 예시] 다음은 "${input}" 질문을 7가지 품질 요소를 반영하여 업그레이드한 프롬프트입니다.\n\n당신은 해당 분야에서 10년 이상 경력을 가진 전문가입니다.\n\n요청사항: ${input}\n\n다음 사항을 모두 포함하여 답변해주세요:\n1. 핵심 원인 분석 (검증된 자료 기반)\n2. 단계별 실행 방법 (즉시 적용 가능하게)\n3. 주의사항 및 예외 케이스\n4. 예상 결과 및 효과\n\n답변은 번호 목록으로 구조화하고, 수치와 근거를 명시해주세요.\n\n※ 이것은 데모 모드 예시입니다. 실제 AI API 연결 시 더 정확한 결과를 얻을 수 있습니다.`
+    prompt:`[데모 모드 예시] "${input}" 질문 업그레이드 결과\n\n당신은 해당 분야의 전문가입니다.\n\n요청: ${input}\n\n다음을 모두 포함해 답변해주세요:\n1. 핵심 원인 분석 (검증된 자료 기반)\n2. 단계별 실행 방법 (즉시 적용 가능)\n3. 주의사항 및 예외 케이스\n4. 예상 결과 및 효과\n\n번호 목록으로 구조화하고 수치·근거를 명시해주세요.\n\n※ 데모 모드입니다. 실제 API 연결 시 더 정확한 결과가 나옵니다.`
   });
 }
 
 async function generate(){
   const input=document.getElementById("userInput").value.trim();
   if(!input){alert("질문을 입력해주세요.");return}
-
-  const key=savedKeys[currentAI]||document.getElementById("apiKeyInput")?.value?.trim()||"";
-  if(currentAI!=="demo"&&!key){
+  const key=keys[cur]||document.getElementById("apiKeyInput")?.value?.trim()||"";
+  if(cur!=="demo"&&!key){
     alert("API 키를 먼저 입력하고 저장해주세요.");
     document.getElementById("apiKeyInput").focus();
     return;
   }
-
   document.getElementById("genBtn").disabled=true;
   document.getElementById("loading").style.display="block";
   document.getElementById("resultWrap").style.display="none";
   document.getElementById("errorBox").style.display="none";
-
   const msgs={claude:"Claude가 분석하는 중...",gpt:"ChatGPT가 분석하는 중...",gemini:"Gemini가 분석하는 중...",demo:"데모 결과 생성 중..."};
-  document.getElementById("loadingMsg").textContent=msgs[currentAI];
+  document.getElementById("loadingMsg").textContent=msgs[cur];
 
   try{
     let raw;
-    if(currentAI==="claude") raw=await callClaude(input,key);
-    else if(currentAI==="gpt") raw=await callGPT(input,key);
-    else if(currentAI==="gemini") raw=await callGemini(input,key);
-    else { await new Promise(r=>setTimeout(r,1200)); raw=demoResult(input); }
-
+    if(cur==="claude") raw=await callClaude(input,key);
+    else if(cur==="gpt") raw=await callGPT(input,key);
+    else if(cur==="gemini") raw=await callGemini(input,key);
+    else{await new Promise(r=>setTimeout(r,1000));raw=demoResult(input)}
     const clean=raw.trim().replace(/```json|```/g,"").trim();
-    const parsed=JSON.parse(clean);
-    renderResult(parsed,currentAI);
+    renderResult(JSON.parse(clean));
   }catch(e){
     const eb=document.getElementById("errorBox");
     eb.style.display="block";
-    eb.innerHTML="⚠️ "+e.message+"<br><small>API 키와 네트워크 상태를 확인해주세요. CORS 오류 시 해당 AI 공식 사이트에서 키 권한을 확인하세요.</small>";
+    eb.innerHTML="⚠️ "+e.message+"<br><small style='font-weight:400'>API 키와 네트워크 상태를 확인해주세요.</small>";
   }finally{
     document.getElementById("loading").style.display="none";
     document.getElementById("genBtn").disabled=false;
   }
 }
 
-const AI_COLORS={claude:"#D97706",gpt:"#10A37F",gemini:"#4285F4",demo:"#7C3AED"};
+const AI_LABELS={claude:"Claude · Anthropic",gpt:"ChatGPT · OpenAI",gemini:"Gemini · Google",demo:"데모 모드"};
 
-function renderResult(data,ai){
-  const color=AI_COLORS[ai]||"#F5C518";
+function renderResult(data){
+  document.getElementById("resultAiBadge").textContent=AI_LABELS[cur];
   const grid=document.getElementById("elemGrid");
   grid.innerHTML="";
   ELEMENTS.forEach(el=>{
     const c=data.elements[el.key]||"-";
-    grid.innerHTML+=`<div class="elem-card" style="border-top-color:${color}">
-      <div class="elem-num" style="color:${color}">${el.num} · ${el.desc.toUpperCase()}</div>
+    grid.innerHTML+=`<div class="elem-card">
+      <div class="elem-num">${el.num} · ${el.desc}</div>
       <div class="elem-name">${el.name}</div>
       <div class="elem-body">${c}</div>
     </div>`;
@@ -389,7 +700,11 @@ function renderResult(data,ai){
 
 function copyPrompt(){
   const t=document.getElementById("promptText").textContent;
-  navigator.clipboard.writeText(t).then(()=>alert("복사 완료!\nClaude, ChatGPT, Gemini에 바로 붙여넣으세요."));
+  navigator.clipboard.writeText(t).then(()=>{
+    const btn=document.querySelector(".copy-btn");
+    btn.textContent="복사됨 ✓";
+    setTimeout(()=>{btn.textContent="복사하기"},1500);
+  });
 }
 
 function resetAll(){

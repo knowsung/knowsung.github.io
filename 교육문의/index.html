@@ -140,6 +140,11 @@ footer{border-top:1px solid var(--line);padding:48px 0 56px;color:var(--ink3);fo
 .form-foot{font-size:12.5px;color:var(--ink3);margin-top:14px;text-align:center}
 .info-box{border:1px solid var(--line);border-radius:var(--r);background:var(--bg2);padding:30px 28px}
 .info-box h3{font-size:18px;font-weight:800;letter-spacing:-.02em;margin-bottom:18px}
+.kakao-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:#FEE500;color:#191919;font-size:15px;font-weight:700;padding:14px 18px;border-radius:12px;transition:.15s}
+.kakao-btn:hover{background:#f5dc00;transform:translateY(-1px)}
+.kakao-btn svg{width:21px;height:21px;flex-shrink:0}
+.kakao-sub{font-size:12.5px;color:var(--ink3);text-align:center;margin:9px 0 22px;line-height:1.5}
+.info-divider{border:0;border-top:1px solid var(--line);margin:0 0 22px}
 .info-item{margin-bottom:20px}
 .info-item:last-child{margin-bottom:0}
 .info-item .k{font-size:12px;font-weight:700;color:var(--red);letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px}
@@ -243,6 +248,12 @@ footer{border-top:1px solid var(--line);padding:48px 0 56px;color:var(--ink3);fo
 
         <!-- Contact info -->
         <div class="info-box">
+          <a href="https://pf.kakao.com/_QcFxexb/chat" target="_blank" rel="noopener" class="kakao-btn">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.48 3 2 6.52 2 10.86c0 2.79 1.86 5.24 4.66 6.63-.16.57-.59 2.12-.68 2.45-.11.41.15.41.32.3.13-.09 2.06-1.4 2.9-1.97.56.08 1.13.13 1.71.13 5.52 0 10-3.52 10-7.87S17.52 3 12 3z"/></svg>
+            카카오톡으로 상담하기
+          </a>
+          <p class="kakao-sub">가장 빠르게 답변받을 수 있어요 · 평일 10:00–18:00</p>
+          <hr class="info-divider">
           <h3>연락처 안내</h3>
           <div class="info-item">
             <div class="k">Address</div>

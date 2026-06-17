@@ -3,416 +3,320 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>프롬프트 업그레이더</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+<title>셰익스컴퍼니 — 마케팅과 인문학을 융합하다</title>
+<meta name="description" content="셰익스피어의 창의력을 바탕으로 마케팅과 인문학의 해답을 제시하는 강연·컨설팅 기업, 셰익스컴퍼니.">
+<link rel="icon" href="/assets/img/logo-circle.png">
+<link rel="preconnect" href="https://fastly.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://fastly.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bk:#0D0D0D;--wh:#FAFAF7;--g1:#F0EEE9;--g2:#D9D6CE;--g3:#9E9B94;
-  --bd:2.5px solid #0D0D0D;--sh:4px 4px 0 #0D0D0D;--sh-sm:3px 3px 0 #0D0D0D;--r:10px;
+  --bg:#ffffff; --bg2:#fafafa; --ink:#191919; --ink2:#454545; --ink3:#787774;
+  --line:#e9e9e7; --line2:#ededec;
+  --red:#CE1126; --red-d:#A60E1F;
+  --r:14px; --maxw:1080px;
 }
-body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:var(--wh);color:var(--bk);min-height:100vh;
-  background-image:radial-gradient(circle,#D9D6CE 1px,transparent 1px);background-size:24px 24px}
-.wrap{max-width:820px;margin:0 auto;padding:36px 20px 60px}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Pretendard','Pretendard Variable',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.7;
+  -webkit-font-smoothing:antialiased; letter-spacing:-.01em;
+}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
 
-.hero{background:var(--bk);border-radius:var(--r);border:var(--bd);box-shadow:var(--sh);padding:32px 32px 28px;margin-bottom:24px;position:relative;overflow:hidden}
-.hero::after{content:'UPGRADE';position:absolute;bottom:-10px;right:16px;font-size:80px;font-weight:900;color:rgba(255,255,255,.04);letter-spacing:-3px;pointer-events:none}
-.hero-badge{display:inline-block;background:var(--wh);color:var(--bk);font-size:11px;font-weight:900;padding:4px 12px;border-radius:99px;border:2px solid var(--wh);letter-spacing:.8px;margin-bottom:14px}
-.hero h1{font-size:32px;font-weight:900;color:var(--wh);letter-spacing:-1px;line-height:1.2}
-.hero p{font-size:13px;color:var(--g3);margin-top:6px}
-.hero-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}
-.htag{background:transparent;color:var(--g2);border:1.5px solid rgba(255,255,255,.2);border-radius:5px;padding:3px 10px;font-size:11px;font-weight:700;letter-spacing:.3px}
+/* ===== Header ===== */
+header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(12px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:66px;max-width:var(--maxw);margin:0 auto;padding:0 24px}
+.logo{font-size:18px;font-weight:800;letter-spacing:-.03em;display:flex;align-items:center;gap:9px}
+.logo img{width:34px;height:34px}
+.menu{display:flex;gap:2px;align-items:center}
+.menu a{font-size:14px;font-weight:500;color:var(--ink2);padding:8px 11px;border-radius:8px;transition:.15s;white-space:nowrap}
+.menu a:hover{background:var(--bg2);color:var(--red)}
+.menu .cta{background:var(--red);color:#fff;font-weight:600;padding:8px 16px;margin-left:6px}
+.menu .cta:hover{background:var(--red-d);color:#fff}
+.burger{display:none;flex-direction:column;gap:5px;background:none;border:0;cursor:pointer;padding:8px}
+.burger span{width:22px;height:2px;background:var(--ink);border-radius:2px;transition:.2s}
 
-.card{background:var(--wh);border-radius:var(--r);border:var(--bd);box-shadow:var(--sh);padding:22px;margin-bottom:20px}
-.sec-label{font-size:10px;font-weight:900;color:var(--g3);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:6px}
-.sec-label::after{content:'';flex:1;height:1.5px;background:var(--g2)}
+/* ===== Hero ===== */
+.hero{padding:84px 0 76px}
+.hero .inner{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+.eyebrow{display:inline-block;font-size:13px;font-weight:700;color:var(--red);border:1px solid rgba(206,17,38,.25);background:rgba(206,17,38,.05);border-radius:99px;padding:6px 16px;margin-bottom:24px}
+.hero h1{font-size:clamp(34px,5.2vw,56px);font-weight:800;line-height:1.16;letter-spacing:-.04em}
+.hero h1 .red{color:var(--red)}
+.hero p.lead{font-size:clamp(16px,2.2vw,19px);color:var(--ink2);margin-top:22px;max-width:520px;font-weight:400}
+.hero .actions{margin-top:34px;display:flex;gap:12px;flex-wrap:wrap}
+.hero-visual{display:flex;justify-content:center}
+.hero-visual img{width:min(360px,80%);height:auto;filter:drop-shadow(0 20px 40px rgba(0,0,0,.12))}
+.btn{display:inline-flex;align-items:center;gap:7px;font-size:15px;font-weight:600;padding:13px 26px;border-radius:11px;border:1px solid transparent;transition:.15s;cursor:pointer}
+.btn-primary{background:var(--red);color:#fff;border-color:var(--red)}
+.btn-primary:hover{background:var(--red-d);border-color:var(--red-d);transform:translateY(-1px)}
+.btn-ghost{background:#fff;color:var(--ink);border-color:var(--line)}
+.btn-ghost:hover{border-color:var(--ink);background:var(--bg2)}
 
-.ai-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.ai-tab{border:var(--bd);border-radius:var(--r);padding:16px 8px;text-align:center;cursor:pointer;transition:all .12s;background:var(--wh)}
-.ai-tab:hover{background:var(--g1);transform:translate(-1px,-1px);box-shadow:var(--sh)}
-.ai-tab.active{background:var(--bk);transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--g2)}
-.ai-tab.active .ai-name{color:var(--wh)}
-.ai-tab.active .ai-sub{color:var(--g3)}
-.ai-tab.active svg path,.ai-tab.active svg rect,.ai-tab.active svg circle,.ai-tab.active svg polygon{filter:brightness(10)}
-.ai-logo{width:28px;height:28px;margin:0 auto 7px;display:flex;align-items:center;justify-content:center}
-.ai-logo svg{width:28px;height:28px}
-.ai-name{font-size:13px;font-weight:900;display:block;color:var(--bk)}
-.ai-sub{font-size:10px;color:var(--g3);display:block;margin-top:2px}
+/* ===== Section ===== */
+section{padding:72px 0}
+.sec-head{text-align:center;margin-bottom:46px}
+.sec-head .tag{font-size:13px;font-weight:700;color:var(--red);letter-spacing:.06em;text-transform:uppercase}
+.sec-head h2{font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.03em;margin-top:8px}
+.sec-head p{color:var(--ink2);margin-top:12px;font-size:16px}
 
-.api-setup{margin-top:18px;padding-top:18px;border-top:1.5px solid var(--g2)}
-.api-row{display:flex;gap:8px}
-.api-input{flex:1;border:var(--bd);border-radius:8px;padding:10px 14px;font-size:13px;font-family:monospace;outline:none;background:var(--g1);color:var(--bk);transition:all .12s}
-.api-input:focus{background:var(--wh);box-shadow:inset 2px 2px 0 var(--bk)}
-.api-input::placeholder{font-family:'Noto Sans KR',sans-serif;font-size:12px;color:var(--g3)}
-.save-btn{background:var(--bk);color:var(--wh);border:var(--bd);border-radius:8px;padding:10px 18px;font-size:13px;font-weight:900;cursor:pointer;white-space:nowrap;transition:all .12s;box-shadow:var(--sh-sm)}
-.save-btn:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--g2)}
-.save-btn:active{transform:translate(1px,1px);box-shadow:none}
-.api-hint{font-size:11px;color:var(--g3);margin-top:8px;line-height:1.7}
-.api-hint a{color:var(--bk);font-weight:700;text-decoration:underline}
+/* ===== Program cards ===== */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.card{border:1px solid var(--line);border-radius:var(--r);padding:30px 28px;background:var(--bg);transition:.18s;display:flex;flex-direction:column}
+.card:hover{border-color:var(--red);transform:translateY(-3px);box-shadow:0 12px 32px rgba(206,17,38,.10)}
+.card .ico{margin-bottom:18px;width:96px;height:96px;border-radius:14px;overflow:hidden}
+.card .ico img{width:100%;height:100%;object-fit:cover;object-position:center;transition:.3s}
+.card:hover .ico img{transform:scale(1.06)}
+.card h3{font-size:20px;font-weight:800;letter-spacing:-.02em}
+.card .sub{color:var(--ink3);font-size:14px;margin-top:6px;font-weight:500}
+.card ul{list-style:none;margin:18px 0 22px}
+.card ul li{font-size:14.5px;color:var(--ink2);padding:5px 0 5px 26px;position:relative}
+.card ul li::before{content:'';position:absolute;left:0;top:11px;width:13px;height:7px;border-left:2px solid var(--red);border-bottom:2px solid var(--red);transform:rotate(-45deg)}
+.card .more{margin-top:auto;font-size:14px;font-weight:700;color:var(--red);display:inline-flex;align-items:center;gap:6px}
+.card .more .arr{transition:.15s}
+.card:hover .more .arr{transform:translate(3px,-3px)}
 
-.demo-notice{background:var(--g1);border:var(--bd);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--bk);margin-top:18px;line-height:1.7;display:none}
-.demo-notice strong{font-weight:900}
+/* ===== Founder ===== */
+.founder{background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.founder .inner{display:grid;grid-template-columns:1fr;gap:22px;max-width:820px;margin:0 auto}
+.founder .photo{border-radius:var(--r);overflow:hidden;border:1px solid var(--line);margin-bottom:6px}
+.founder .photo img{width:100%;height:auto}
+.founder h2{font-size:clamp(24px,4vw,34px);font-weight:800;letter-spacing:-.03em;margin-bottom:8px}
+.founder p{color:var(--ink2);font-size:16px;margin-top:14px}
+.founder p strong{color:var(--red)}
+.founder .name{margin-top:24px;font-weight:700;color:var(--ink)}
+.founder .name span{color:var(--ink3);font-weight:500}
 
-.input-area{margin-top:18px;padding-top:18px;border-top:1.5px solid var(--g2)}
-.input-row{display:flex;gap:10px;align-items:flex-end}
-.main-input{flex:1;border:var(--bd);border-radius:8px;padding:14px 16px;font-size:15px;font-family:'Noto Sans KR',sans-serif;font-weight:700;outline:none;resize:none;min-height:58px;line-height:1.6;background:var(--g1);color:var(--bk);transition:all .12s}
-.main-input:focus{background:var(--wh);box-shadow:inset 2px 2px 0 var(--bk)}
-.main-input::placeholder{color:var(--g3);font-weight:400}
-.gen-btn{background:var(--bk);color:var(--wh);border:var(--bd);border-radius:8px;padding:14px 22px;font-size:14px;font-weight:900;cursor:pointer;min-height:58px;min-width:120px;white-space:nowrap;transition:all .12s;box-shadow:var(--sh);letter-spacing:-.3px}
-.gen-btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--g2)}
-.gen-btn:active{transform:translate(2px,2px);box-shadow:none}
-.gen-btn:disabled{background:var(--g2);color:var(--g3);cursor:not-allowed;transform:none;box-shadow:var(--sh-sm)}
+/* ===== Testimonials ===== */
+.quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.quote{border:1px solid var(--line);border-radius:var(--r);padding:26px 24px;background:var(--bg)}
+.quote .mark{font-size:42px;font-weight:800;line-height:.5;color:var(--red)}
+.quote p{font-size:14.5px;color:var(--ink2);margin:10px 0 18px}
+.quote .who{font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px}
+.quote .who::before{content:'';width:18px;height:2px;background:var(--red)}
 
-.examples{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px;align-items:center}
-.ex-lbl{font-size:11px;color:var(--g3);font-weight:700}
-.ex-tag{background:var(--wh);border:var(--bd);border-radius:6px;padding:4px 12px;font-size:12px;font-weight:700;color:var(--bk);cursor:pointer;transition:all .12s;box-shadow:2px 2px 0 var(--bk)}
-.ex-tag:hover{background:var(--bk);color:var(--wh);transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--g2)}
+/* ===== CTA band ===== */
+.band{background:var(--red);color:#fff;border-radius:20px;padding:58px 32px;text-align:center;overflow:hidden;position:relative}
+.band h2{font-size:clamp(24px,4vw,34px);font-weight:800;letter-spacing:-.03em}
+.band p{color:rgba(255,255,255,.85);margin-top:12px;font-size:16px}
+.band .btn-primary{background:#fff;color:var(--red);border-color:#fff;margin-top:26px;font-weight:700}
+.band .btn-primary:hover{background:#f2f2f2;color:var(--red-d)}
 
-.error-box{background:#FFF0F0;border:2px solid #C00;border-radius:8px;padding:12px 16px;font-size:13px;font-weight:700;color:#C00;margin-top:12px;line-height:1.6;display:none;box-shadow:3px 3px 0 #C00}
+/* ===== Footer ===== */
+footer{border-top:1px solid var(--line);padding:48px 0 56px;color:var(--ink3);font-size:13.5px}
+.foot-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px;margin-bottom:24px}
+.foot-top .logo{color:var(--ink)}
+.foot-links{display:flex;gap:18px;flex-wrap:wrap}
+.foot-links a{color:var(--ink3)}
+.foot-links a:hover{color:var(--red)}
+.foot-info{line-height:1.9}
 
-.loading{text-align:center;padding:44px;display:none}
-.spin{width:36px;height:36px;border:3px solid var(--g2);border-top-color:var(--bk);border-radius:50%;animation:spin .6s linear infinite;margin:0 auto 14px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading p{font-size:13px;font-weight:700;color:var(--g3)}
-
-.result-wrap{display:none}
-.result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
-.result-title{font-size:16px;font-weight:900;letter-spacing:-.3px}
-.result-badge{background:var(--bk);color:var(--wh);border-radius:6px;border:var(--bd);padding:4px 12px;font-size:11px;font-weight:900;box-shadow:var(--sh-sm)}
-
-.elem-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:12px;margin-bottom:20px}
-.elem-card{background:var(--wh);border:var(--bd);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh-sm);transition:all .12s;position:relative;overflow:hidden}
-.elem-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--bk)}
-.elem-card:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--bk)}
-.elem-num{font-size:10px;font-weight:900;letter-spacing:.6px;margin-bottom:3px;color:var(--g3)}
-.elem-name{font-size:13px;font-weight:900;color:var(--bk);margin-bottom:6px}
-.elem-body{font-size:12px;color:#555;line-height:1.65}
-
-.prompt-out{background:var(--bk);border-radius:var(--r);border:var(--bd);box-shadow:var(--sh);padding:22px 24px;margin-bottom:18px}
-.prompt-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.prompt-lbl{font-size:11px;font-weight:900;color:var(--wh);letter-spacing:.6px;display:flex;align-items:center;gap:6px}
-.prompt-lbl::before{content:'';display:inline-block;width:8px;height:8px;background:var(--wh);border-radius:50%}
-.copy-btn{background:var(--wh);color:var(--bk);border:2px solid var(--wh);border-radius:6px;padding:5px 14px;font-size:11px;font-weight:900;cursor:pointer;transition:all .12s}
-.copy-btn:hover{background:var(--g2);border-color:var(--g2)}
-.prompt-text{font-size:13px;color:#D9D9D9;line-height:1.9;white-space:pre-wrap;font-family:'Noto Sans KR',sans-serif}
-
-.action-row{display:flex;gap:10px;justify-content:center}
-.reset-btn{background:var(--wh);color:var(--bk);border:var(--bd);border-radius:8px;padding:12px 26px;font-size:13px;font-weight:900;cursor:pointer;box-shadow:var(--sh-sm);transition:all .12s}
-.reset-btn:hover{background:var(--g1);transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--bk)}
-.use-btn{background:var(--bk);color:var(--wh);border:var(--bd);border-radius:8px;padding:12px 26px;font-size:13px;font-weight:900;cursor:pointer;box-shadow:var(--sh);transition:all .12s}
-.use-btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--g2)}
-
-.footer{text-align:center;font-size:11px;color:var(--g3);margin-top:24px;font-weight:700;letter-spacing:.3px}
-
-@media(max-width:600px){
-  .hero{padding:22px 18px 20px}.hero h1{font-size:24px}
-  .ai-tabs{grid-template-columns:repeat(2,1fr)}
-  .gen-btn{min-width:90px;padding:14px;font-size:13px}
-  .action-row{flex-direction:column}
+@media(max-width:820px){
+  .menu{position:fixed;inset:66px 0 auto 0;background:#fff;flex-direction:column;align-items:stretch;gap:2px;padding:12px 16px 20px;border-bottom:1px solid var(--line);transform:translateY(-130%);transition:.25s;box-shadow:0 12px 24px rgba(0,0,0,.06)}
+  .menu.open{transform:translateY(0)}
+  .menu a{padding:12px 14px;font-size:15px}
+  .menu .cta{margin:8px 0 0;text-align:center}
+  .burger{display:flex}
+  .hero .inner{grid-template-columns:1fr;gap:8px;text-align:center}
+  .hero-visual{order:-1;margin-bottom:8px}
+  .hero p.lead{margin-left:auto;margin-right:auto}
+  .hero .actions{justify-content:center}
+  .grid{grid-template-columns:1fr}
+  .quotes{grid-template-columns:1fr}
+  .hero{padding:56px 0 48px}
+  section{padding:56px 0}
 }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <div class="hero">
-    <div class="hero-badge">PROMPT UPGRADER v3</div>
-    <h1>프롬프트<br>업그레이더</h1>
-    <p>한 줄 질문 → 7가지 품질 요소가 완벽하게 담긴 프롬프트로 변환</p>
-    <div class="hero-tags">
-      <span class="htag">00 전문성</span><span class="htag">01 정확성</span>
-      <span class="htag">02 일관성</span><span class="htag">03 완결성</span>
-      <span class="htag">04 명료성</span><span class="htag">05 관련성</span>
-      <span class="htag">06 실행가능성</span>
+<header>
+  <div class="nav">
+    <a href="/" class="logo"><img src="/assets/img/logo-circle.png" alt="셰익스컴퍼니 로고">셰익스컴퍼니</a>
+    <nav class="menu" id="menu">
+      <a href="/about/">회사소개</a>
+      <a href="#programs">마케팅교육</a>
+      <a href="#programs">생성형AI</a>
+      <a href="#programs">인문학/리더십</a>
+      <a href="#programs">서포터즈/기자단</a>
+      <a href="#contact" class="cta">교육상담</a>
+    </nav>
+    <button class="burger" id="burger" aria-label="메뉴"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<main>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="inner">
+        <div class="hero-text">
+          <span class="eyebrow">강연, 그 이상의 감동</span>
+          <h1>마케팅과 인문학을<br><span class="red">융합하다</span></h1>
+          <p class="lead">셰익스피어의 창의력을 바탕으로 마케팅과 인문학의 해답을 제시하는 강연·컨설팅 기업. 셰익스컴퍼니가 함께 합니다.</p>
+          <div class="actions">
+            <a href="#programs" class="btn btn-primary">교육 프로그램 보기</a>
+            <a href="#contact" class="btn btn-ghost">교육 상담 문의</a>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <img src="/assets/img/logo-circle.png" alt="셰익스컴퍼니">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Programs -->
+  <section id="programs">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="tag">Programs</div>
+        <h2>교육 프로그램</h2>
+        <p>이론부터 실전까지, 분야별 전문 커리큘럼</p>
+      </div>
+      <div class="grid">
+
+        <a href="/마케팅-커리큘럼/" class="card">
+          <div class="ico"><img src="/assets/img/shakespeare.png" alt="마케팅 교육"></div>
+          <h3>마케팅 교육</h3>
+          <div class="sub">마케팅 A to Z 완벽 마스터</div>
+          <ul>
+            <li>타겟 고객 분석</li>
+            <li>매력적인 콘텐츠 제작</li>
+            <li>성공적인 광고 전략</li>
+            <li>데이터 분석</li>
+          </ul>
+          <span class="more">커리큘럼 보기 <span class="arr">↗</span></span>
+        </a>
+
+        <a href="/ai-커리큘럼/" class="card">
+          <div class="ico"><img src="/assets/img/einstein.png" alt="생성형AI 교육"></div>
+          <h3>생성형AI 교육</h3>
+          <div class="sub">생성형AI 활용의 모든 것</div>
+          <ul>
+            <li>기초부터 고급 활용까지</li>
+            <li>프롬프트 엔지니어링 마스터</li>
+            <li>다양한 분야 활용법</li>
+            <li>실전 예제로 배우는 생성형AI(클로드, 제미나이, 챗GPT)</li>
+          </ul>
+          <span class="more">커리큘럼 보기 <span class="arr">↗</span></span>
+        </a>
+
+        <a href="/서포터즈-기자단-커리큘럼/" class="card">
+          <div class="ico"><img src="/assets/img/picasso.png" alt="서포터즈 기자단 교육"></div>
+          <h3>서포터즈 / 기자단 교육</h3>
+          <div class="sub">실전 경험 UP! 스펙 UP!</div>
+          <ul>
+            <li>콘텐츠 기획 / 제작 노하우</li>
+            <li>미디어 전문가의 생생한 꿀팁</li>
+            <li>SNS 마케팅 전략</li>
+            <li>SNS를 활용한 콘텐츠 활용법</li>
+          </ul>
+          <span class="more">커리큘럼 보기 <span class="arr">↗</span></span>
+        </a>
+
+        <a href="/인문학-커리큘럼/" class="card">
+          <div class="ico"><img src="/assets/img/humanities.png" alt="인문학 리더십 교육"></div>
+          <h3>인문학 / 리더십 / 커뮤니케이션</h3>
+          <div class="sub">진정한 리더로 거듭나라</div>
+          <ul>
+            <li>리더십 사례 완벽 정리</li>
+            <li>카리스마 &amp; 소통 리더십</li>
+            <li>팀워크 &amp; 동기 부여 전략</li>
+            <li>실전 사례 분석</li>
+          </ul>
+          <span class="more">커리큘럼 보기 <span class="arr">↗</span></span>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Founder -->
+  <section class="founder">
+    <div class="wrap">
+      <div class="inner">
+        <div class="photo"><img src="/assets/img/lecture.png" alt="박노성 대표 강연"></div>
+        <div class="sec-head" style="text-align:left;margin-bottom:0">
+          <div class="tag">About</div>
+          <h2>셰익스컴퍼니를 만나보세요</h2>
+        </div>
+        <p>대홍기획이라는 대형 광고대행사에서 정통 마케팅을 배우면서 가장 중요한 것은 <strong>사람의 심리</strong>라는 사실을 깨달았습니다. 사실 사람은 인생의 교과서와도 같은 존재죠. 유능한 마케터는 소비자를 먼저 이해할 줄 아는 사람입니다. 그래서 셰익스컴퍼니의 교육은 인문학에서 시작합니다.</p>
+        <p>국내 굴지의 대기업과 중소기업에서 마케팅을 실행하던 내내 '어떻게 하면 가장 적은 비용으로 가장 효과적인 마케팅을 할 수 있는지' 고민했습니다. 이때의 경험을 바탕으로 부산 신라대학교 광고홍보학과에서 겸임교수로 학생들을 가르치면서 다양한 마케팅 도구를 개발했습니다.</p>
+        <div class="name">박노성 <span>· 셰익스컴퍼니 대표</span></div>
+        <div style="margin-top:20px"><a href="/about/" class="btn btn-ghost">셰익스컴퍼니 소개 →</a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section>
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="tag">Reviews</div>
+        <h2>셰익스컴퍼니 강의 후기</h2>
+        <p>대기업 임직원들이 직접 남긴 수강 후기</p>
+      </div>
+      <div class="quotes">
+        <div class="quote">
+          <div class="mark">"</div>
+          <p>마케팅 관련하여 짧았지만 많은 도움 받았습니다. 저희 팀은 현재 태국에서 런칭 준비 중인데, 정말 큰 도움이 되었습니다. 진심으로 감사합니다.</p>
+          <div class="who">주OO · KB금융그룹</div>
+        </div>
+        <div class="quote">
+          <div class="mark">"</div>
+          <p>오늘 강의가 이제까지 들었던 강의 중에 가장 알차고 많이 알아갈 수 있던 강의였습니다! 하루만 진행되는 게 아쉬울 정도로요. 조원들도 다 같은 의견이었습니다.</p>
+          <div class="who">최OO · 현대자동차그룹</div>
+        </div>
+        <div class="quote">
+          <div class="mark">"</div>
+          <p>안다고 생각했던 것들의 히스토리와 연결감에서 새로운 인사이트를 많이 수집했습니다. 매우 재미있었어요. 다음 수업이 기다려지는 교육은 정말 오랜만이에요.</p>
+          <div class="who">한OO · 아모레퍼시픽</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA band -->
+  <section id="contact" style="padding-top:8px">
+    <div class="wrap">
+      <div class="band">
+        <h2>지금 바로 시작하세요</h2>
+        <p>강연·교육·컨설팅 문의를 남겨주시면 빠르게 연락드리겠습니다.</p>
+        <a href="/교육문의/" class="btn btn-primary">교육 상담 문의하기</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <a href="/" class="logo"><img src="/assets/img/logo-circle.png" alt="셰익스컴퍼니 로고" style="width:30px;height:30px">셰익스컴퍼니</a>
+      <nav class="foot-links">
+        <a href="/about/">회사소개</a>
+        <a href="/마케팅-커리큘럼/">마케팅교육</a>
+        <a href="/ai-커리큘럼/">생성형AI</a>
+        <a href="/교육문의/">교육상담</a>
+      </nav>
+    </div>
+    <div class="foot-info">
+      <strong style="color:var(--ink2)">셰익스컴퍼니</strong><br>
+      서울 송파구 충민로 66 (문정동, 가든파이브 라이프) 테크노관 T-6080<br>
+      대표자 박노성 &nbsp;|&nbsp; 사업자등록번호 441-66-00323<br>
+      <span style="display:inline-block;margin-top:10px">© 2026 Shakes Company. All rights reserved.</span>
     </div>
   </div>
-
-  <div class="card">
-    <div class="sec-label">AI 선택 및 API 키 설정</div>
-    <div class="ai-tabs">
-
-      <div class="ai-tab active" id="tab-claude" onclick="selectAI('claude')">
-        <div class="ai-logo">
-          <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M14 3C8.477 3 4 7.477 4 13c0 2.136.672 4.116 1.814 5.74L4.5 23.5l4.926-1.29A9.953 9.953 0 0014 23c5.523 0 10-4.477 10-10S19.523 3 14 3z" fill="#D97706"/>
-            <path d="M10.5 12.5h7M10.5 15.5h5" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <span class="ai-name">Claude</span>
-        <span class="ai-sub">Anthropic</span>
-      </div>
-
-      <div class="ai-tab" id="tab-gpt" onclick="selectAI('gpt')">
-        <div class="ai-logo">
-          <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M25.1 11.6a6.5 6.5 0 00-.56-5.33 6.57 6.57 0 00-7.07-3.15A6.5 6.5 0 0012.6 1a6.57 6.57 0 00-6.26 4.55 6.5 6.5 0 00-4.34 3.15 6.57 6.57 0 00.81 7.7 6.5 6.5 0 00.56 5.32 6.57 6.57 0 007.07 3.16A6.5 6.5 0 0015.4 27a6.57 6.57 0 006.27-4.56 6.5 6.5 0 004.34-3.14 6.57 6.57 0 00-.81-7.7z" fill="#10A37F"/>
-            <path d="M17.5 14l-5 2.9V11.1L17.5 14z" fill="white"/>
-          </svg>
-        </div>
-        <span class="ai-name">ChatGPT</span>
-        <span class="ai-sub">OpenAI</span>
-      </div>
-
-      <div class="ai-tab" id="tab-gemini" onclick="selectAI('gemini')">
-        <div class="ai-logo">
-          <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M14 4c0 5.52-4.48 10-10 10 5.52 0 10 4.48 10 10 0-5.52 4.48-10 10-10-5.52 0-10-4.48-10-10z" fill="url(#gem)"/>
-            <defs>
-              <linearGradient id="gem" x1="4" y1="4" x2="24" y2="24" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#4285F4"/>
-                <stop offset="50%" stop-color="#9B59B6"/>
-                <stop offset="100%" stop-color="#E74C3C"/>
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-        <span class="ai-name">Gemini</span>
-        <span class="ai-sub">Google</span>
-      </div>
-
-      <div class="ai-tab" id="tab-demo" onclick="selectAI('demo')">
-        <div class="ai-logo">
-          <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="3" y="3" width="22" height="22" rx="5" fill="#7C3AED"/>
-            <path d="M9 14h10M14 9v10" stroke="white" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <span class="ai-name">데모 모드</span>
-        <span class="ai-sub">API 없이 테스트</span>
-      </div>
-
-    </div>
-
-    <div class="api-setup" id="apiSetup">
-      <div class="api-row">
-        <input class="api-input" type="password" id="apiKeyInput" placeholder="sk-ant-api... (Anthropic Console에서 발급)"/>
-        <button class="save-btn" id="saveBtn" onclick="saveKey()">저장</button>
-      </div>
-      <div class="api-hint" id="apiHint">
-        Claude API 키 발급: <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>
-        · 키는 브라우저에만 저장되며 외부로 전송되지 않습니다.
-      </div>
-    </div>
-
-    <div class="demo-notice" id="demoNotice">
-      <strong>데모 모드</strong> — API 키 없이 7가지 요소 구조를 미리 체험할 수 있습니다.
-      실제 AI 생성 결과가 아닌 예시 답변이 표시됩니다.
-    </div>
-
-    <div class="input-area">
-      <div class="sec-label">질문 입력</div>
-      <div class="input-row">
-        <textarea class="main-input" id="userInput" placeholder="예) 사출 공정 불량률이 갑자기 올라갔어" rows="2"></textarea>
-        <button class="gen-btn" id="genBtn" onclick="generate()">업그레이드 ↗</button>
-      </div>
-      <div class="examples">
-        <span class="ex-lbl">예시</span>
-        <span class="ex-tag" onclick="setEx(this)">불량률 계산해줘</span>
-        <span class="ex-tag" onclick="setEx(this)">클레임 들어왔어</span>
-        <span class="ex-tag" onclick="setEx(this)">수입 검사 방법</span>
-        <span class="ex-tag" onclick="setEx(this)">마케팅 전략</span>
-        <span class="ex-tag" onclick="setEx(this)">이메일 써줘</span>
-        <span class="ex-tag" onclick="setEx(this)">보고서 형식</span>
-      </div>
-      <div class="error-box" id="errorBox"></div>
-    </div>
-  </div>
-
-  <div class="loading" id="loading">
-    <div class="spin"></div>
-    <p id="loadingMsg">7가지 품질 요소를 분석하는 중...</p>
-  </div>
-
-  <div class="result-wrap" id="resultWrap">
-    <div class="card">
-      <div class="result-header">
-        <div class="result-title">7가지 품질 요소 분석 결과</div>
-        <div class="result-badge" id="resultBadge">Claude</div>
-      </div>
-      <div class="elem-grid" id="elemGrid"></div>
-    </div>
-    <div class="prompt-out">
-      <div class="prompt-hd">
-        <span class="prompt-lbl">업그레이드된 프롬프트</span>
-        <button class="copy-btn" id="copyBtn" onclick="copyPrompt()">복사하기</button>
-      </div>
-      <div class="prompt-text" id="promptText"></div>
-    </div>
-    <div class="action-row">
-      <button class="reset-btn" onclick="resetAll()">← 새 질문 입력</button>
-      <button class="use-btn" onclick="copyPrompt()">프롬프트 복사 후 사용 ↗</button>
-    </div>
-  </div>
-
-  <div class="footer">PROMPT UPGRADER v3 · 셰익스컴퍼니 · Powered by AI API</div>
-</div>
+</footer>
 
 <script>
-const ELEMENTS=[
-  {key:"persona",num:"00",name:"전문성 (Persona)",desc:"PERSONA"},
-  {key:"accuracy",num:"01",name:"정확성 (Accuracy)",desc:"ACCURACY"},
-  {key:"consistency",num:"02",name:"일관성 (Consistency)",desc:"CONSISTENCY"},
-  {key:"completeness",num:"03",name:"완결성 (Completeness)",desc:"COMPLETENESS"},
-  {key:"clarity",num:"04",name:"명료성 (Clarity)",desc:"CLARITY"},
-  {key:"relevance",num:"05",name:"관련성 (Relevance)",desc:"RELEVANCE"},
-  {key:"actionability",num:"06",name:"실행가능성 (Actionability)",desc:"ACTIONABILITY"},
-];
-
-const AI_CFG={
-  claude:{
-    label:"Claude · Anthropic",
-    ph:"sk-ant-api... (Anthropic Console에서 발급)",
-    hint:'Claude API 키 발급: <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> · 키는 브라우저에만 저장됩니다.'
-  },
-  gpt:{
-    label:"ChatGPT · OpenAI",
-    ph:"sk-... (OpenAI Platform에서 발급)",
-    hint:'OpenAI API 키 발급: <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a> · 키는 브라우저에만 저장됩니다.'
-  },
-  gemini:{
-    label:"Gemini · Google",
-    ph:"AIza... (Google AI Studio에서 발급)",
-    hint:'Gemini API 키 발급: <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a> · 키는 브라우저에만 저장됩니다.'
-  },
-  demo:{label:"Demo Mode",ph:"",hint:""}
-};
-
-let cur="claude";
-const keys={claude:"",gpt:"",gemini:""};
-
-function selectAI(ai){
-  cur=ai;
-  document.querySelectorAll(".ai-tab").forEach(t=>t.classList.remove("active"));
-  document.getElementById("tab-"+ai).classList.add("active");
-  const setup=document.getElementById("apiSetup");
-  const demo=document.getElementById("demoNotice");
-  if(ai==="demo"){setup.style.display="none";demo.style.display="block";}
-  else{
-    setup.style.display="block";demo.style.display="none";
-    const c=AI_CFG[ai];
-    document.getElementById("apiKeyInput").placeholder=c.ph;
-    document.getElementById("apiKeyInput").value=keys[ai]||"";
-    document.getElementById("apiHint").innerHTML=c.hint;
-  }
-}
-
-function saveKey(){
-  const v=document.getElementById("apiKeyInput").value.trim();
-  if(!v){alert("API 키를 입력해주세요.");return}
-  keys[cur]=v;
-  const btn=document.getElementById("saveBtn");
-  btn.textContent="저장됨 ✓";btn.style.background="#375623";
-  setTimeout(()=>{btn.textContent="저장";btn.style.background=""},1800);
-}
-
-function setEx(el){document.getElementById("userInput").value=el.textContent}
-
-const SYS="You are a prompt quality expert.\nUpgrade the user's short question into a high-quality prompt that includes all 7 quality elements:\n00. Persona: assign an appropriate expert role\n01. Accuracy: request fact-based, verifiable information\n02. Consistency: maintain consistent format and standards\n03. Completeness: include all necessary items\n04. Clarity: use easy-to-understand structure\n05. Relevance: focus on the intent of the question\n06. Actionability: immediately applicable in practice\n\nRespond ONLY with pure JSON (no markdown code blocks):\n{\"elements\":{\"persona\":\"...\",\"accuracy\":\"...\",\"consistency\":\"...\",\"completeness\":\"...\",\"clarity\":\"...\",\"relevance\":\"...\",\"actionability\":\"...\"},\"prompt\":\"complete upgraded prompt in Korean (400-600 chars)\"}";
-
-async function callClaude(input,key){
-  const headers=new Headers();
-  headers.append("Content-Type","application/json");
-  headers.append("x-api-key",key);
-  headers.append("anthropic-version","2023-06-01");
-  headers.append("anthropic-dangerous-direct-browser-access","true");
-  const r=await fetch("https://api.anthropic.com/v1/messages",{
-    method:"POST",headers,
-    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,system:SYS,messages:[{role:"user",content:input}]})
-  });
-  const d=await r.json();
-  if(d.error)throw new Error(d.error.message);
-  return d.content[0].text;
-}
-
-async function callGPT(input,key){
-  const r=await fetch("https://api.openai.com/v1/chat/completions",{
-    method:"POST",
-    headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
-    body:JSON.stringify({model:"gpt-4o-mini",messages:[{role:"system",content:SYS},{role:"user",content:input}],max_tokens:1000})
-  });
-  const d=await r.json();
-  if(d.error)throw new Error(d.error.message);
-  return d.choices[0].message.content;
-}
-
-async function callGemini(input,key){
-  const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key="+key,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({contents:[{parts:[{text:SYS+"\n\nUser input: "+input}]}]})
-  });
-  const d=await r.json();
-  if(d.error)throw new Error(d.error.message);
-  return d.candidates[0].content.parts[0].text;
-}
-
-function demoResult(input){
-  return '{"elements":{"persona":"'+input+'에 답하기 위해 해당 분야 10년 이상 경력의 전문가 역할을 설정합니다.","accuracy":"제공하는 수치와 기준은 검증된 자료에 근거하며, 불확실한 내용은 명시합니다.","consistency":"답변 전반에 걸쳐 동일한 용어와 기준을 일관되게 사용합니다.","completeness":"요청한 모든 항목을 빠짐없이 포함하고 관련 부가 정보도 제공합니다.","clarity":"복잡한 내용은 단계별 번호 목록으로 구조화하여 이해하기 쉽게 제시합니다.","relevance":"질문의 핵심 의도에 집중하며 불필요한 내용은 최소화합니다.","actionability":"답변을 받은 즉시 현장에서 적용할 수 있도록 구체적인 실행 방법을 포함합니다."},"prompt":"[데모 모드] \\n\\n당신은 해당 분야의 전문가입니다.\\n\\n요청: '+input+'\\n\\n다음을 모두 포함해 답변해주세요:\\n1. 핵심 원인 분석 (검증된 자료 기반)\\n2. 단계별 실행 방법 (즉시 적용 가능)\\n3. 주의사항 및 예외 케이스\\n4. 예상 결과 및 효과\\n\\n번호 목록으로 구조화하고 수치와 근거를 명시해주세요.\\n\\n※ 데모 모드입니다. 실제 API 연결 시 더 정확한 결과가 나옵니다."}';
-}
-
-async function generate(){
-  const input=document.getElementById("userInput").value.trim();
-  if(!input){alert("질문을 입력해주세요.");return}
-  const key=keys[cur]||document.getElementById("apiKeyInput")?.value?.trim()||"";
-  if(cur!=="demo"&&!key){alert("API 키를 먼저 입력하고 저장해주세요.");document.getElementById("apiKeyInput").focus();return}
-  document.getElementById("genBtn").disabled=true;
-  document.getElementById("loading").style.display="block";
-  document.getElementById("resultWrap").style.display="none";
-  document.getElementById("errorBox").style.display="none";
-  const msgs={claude:"Claude가 분석하는 중...",gpt:"ChatGPT가 분석하는 중...",gemini:"Gemini가 분석하는 중...",demo:"데모 결과 생성 중..."};
-  document.getElementById("loadingMsg").textContent=msgs[cur];
-  try{
-    let raw;
-    if(cur==="claude") raw=await callClaude(input,key);
-    else if(cur==="gpt") raw=await callGPT(input,key);
-    else if(cur==="gemini") raw=await callGemini(input,key);
-    else{await new Promise(r=>setTimeout(r,900));raw=demoResult(input)}
-    const clean=raw.trim().replace(/```json|```/g,"").trim();
-    renderResult(JSON.parse(clean));
-  }catch(e){
-    const eb=document.getElementById("errorBox");
-    eb.style.display="block";
-    eb.innerHTML="<strong>오류:</strong> "+e.message+"<br><small style='font-weight:400;margin-top:4px;display:block'>API 키와 네트워크 상태를 확인해주세요.</small>";
-  }finally{
-    document.getElementById("loading").style.display="none";
-    document.getElementById("genBtn").disabled=false;
-  }
-}
-
-function renderResult(data){
-  document.getElementById("resultBadge").textContent=AI_CFG[cur].label;
-  const grid=document.getElementById("elemGrid");
-  grid.innerHTML="";
-  ELEMENTS.forEach(el=>{
-    const c=data.elements[el.key]||"-";
-    grid.innerHTML+=`<div class="elem-card"><div class="elem-num">${el.num} · ${el.desc}</div><div class="elem-name">${el.name}</div><div class="elem-body">${c}</div></div>`;
-  });
-  document.getElementById("promptText").textContent=data.prompt;
-  document.getElementById("resultWrap").style.display="block";
-  document.getElementById("resultWrap").scrollIntoView({behavior:"smooth",block:"start"});
-}
-
-function copyPrompt(){
-  const t=document.getElementById("promptText").textContent;
-  navigator.clipboard.writeText(t).then(()=>{
-    const btn=document.getElementById("copyBtn");
-    btn.textContent="복사됨 ✓";
-    setTimeout(()=>{btn.textContent="복사하기"},1500);
-  });
-}
-
-function resetAll(){
-  document.getElementById("userInput").value="";
-  document.getElementById("resultWrap").style.display="none";
-  document.getElementById("errorBox").style.display="none";
-  window.scrollTo({top:0,behavior:"smooth"});
-}
-
-document.getElementById("userInput").addEventListener("keydown",e=>{
-  if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();generate()}
-});
-
-selectAI("claude");
+  const burger=document.getElementById('burger'), menu=document.getElementById('menu');
+  burger.addEventListener('click',()=>menu.classList.toggle('open'));
+  menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>menu.classList.remove('open')));
 </script>
 </body>
 </html>

@@ -121,7 +121,9 @@ footer{border-top:1px solid var(--line);padding:48px 0 56px;color:var(--ink3);fo
 .form-card{border:1px solid var(--line);border-radius:var(--r);background:var(--bg);padding:34px 32px;box-shadow:0 8px 28px rgba(0,0,0,.04)}
 .form-card h2{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px}
 .form-card .lead{color:var(--ink2);font-size:14.5px;margin-bottom:24px}
-.fs-note{font-size:13px;font-weight:600;color:var(--red);background:rgba(206,17,38,.05);border:1px solid rgba(206,17,38,.2);border-radius:10px;padding:11px 14px;margin-bottom:22px;line-height:1.6}
+.form-msg{display:none;font-size:14px;font-weight:600;border-radius:10px;padding:13px 16px;margin-bottom:22px;line-height:1.6}
+.form-msg.ok{color:#0a7d34;background:rgba(10,125,52,.07);border:1px solid rgba(10,125,52,.28)}
+.form-msg.err{color:var(--red-d);background:rgba(206,17,38,.05);border:1px solid rgba(206,17,38,.25)}
 .field{margin-bottom:18px}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .field label{display:block;font-size:13px;font-weight:700;color:var(--ink);margin-bottom:7px;letter-spacing:-.01em}
@@ -189,10 +191,10 @@ footer{border-top:1px solid var(--line);padding:48px 0 56px;color:var(--ink3);fo
           <h2>문의 양식</h2>
           <p class="lead">필수 항목(<span style="color:var(--red)">*</span>)을 입력하신 뒤 제출해 주세요.</p>
 
-          <!-- ※ Formspree 폼 ID를 발급받아 아래 action 주소의 YOUR_FORM_ID를 교체하세요 -->
-          <div class="fs-note">※ Formspree 폼 ID를 발급받아 아래 action 주소의 <strong>YOUR_FORM_ID</strong>를 교체하세요. (https://formspree.io 에서 무료 발급)</div>
+          <div class="form-msg" id="form-msg" role="alert"></div>
 
-          <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+          <form id="contact-form" action="https://formspree.io/f/xykaagpo" method="POST">
+            <input type="hidden" name="_subject" value="[셰익스컴퍼니] 새 교육 문의">
             <div class="field-row">
               <div class="field">
                 <label for="name">이름<span class="req">*</span></label>
@@ -291,6 +293,35 @@ footer{border-top:1px solid var(--line);padding:48px 0 56px;color:var(--ink3);fo
   const burger=document.getElementById('burger'), menu=document.getElementById('menu');
   burger.addEventListener('click',()=>menu.classList.toggle('open'));
   menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>menu.classList.remove('open')));
+
+  // ===== Formspree AJAX 제출 (페이지 이동 없이 처리) =====
+  const form=document.getElementById('contact-form'), msg=document.getElementById('form-msg');
+  form.addEventListener('submit',async(e)=>{
+    e.preventDefault();
+    const btn=form.querySelector('button[type=submit]'), label=btn.textContent;
+    btn.disabled=true; btn.textContent='보내는 중...'; msg.style.display='none';
+    try{
+      const res=await fetch(form.action,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}});
+      if(res.ok){
+        form.reset();
+        msg.className='form-msg ok';
+        msg.textContent='문의가 정상적으로 접수되었습니다. 빠른 시일 내에 연락드리겠습니다. 감사합니다!';
+        msg.style.display='block';
+        msg.scrollIntoView({behavior:'smooth',block:'center'});
+      }else{
+        const data=await res.json().catch(()=>({}));
+        msg.className='form-msg err';
+        msg.textContent=(data.errors&&data.errors.length)?data.errors.map(x=>x.message).join(' / '):'전송에 실패했습니다. 잠시 후 다시 시도하시거나 이메일로 문의해 주세요.';
+        msg.style.display='block';
+      }
+    }catch(err){
+      msg.className='form-msg err';
+      msg.textContent='네트워크 오류로 전송하지 못했습니다. 잠시 후 다시 시도해 주세요.';
+      msg.style.display='block';
+    }finally{
+      btn.disabled=false; btn.textContent=label;
+    }
+  });
 </script>
 </body>
 </html>

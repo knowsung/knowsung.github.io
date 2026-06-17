@@ -135,6 +135,14 @@ footer{border-top:1px solid var(--line);padding:48px 0 56px;color:var(--ink3);fo
   .modules{grid-template-columns:1fr}
   .tools{grid-template-columns:1fr}
 }
+/* ===== CTA 분할 박스 ===== */
+.cta-stack{display:flex;flex-direction:column;gap:14px}
+.band.sm{padding:42px 32px}
+.band.dark{background:var(--ink);display:block;transition:.18s}
+.band.dark:hover{transform:translateY(-2px);box-shadow:0 16px 40px rgba(0,0,0,.18)}
+.band.dark p{color:rgba(255,255,255,.8)}
+.band.dark .btn{background:#fff;color:var(--ink);border-color:#fff;margin-top:22px}
+.band.dark:hover .btn{background:#ededed}
 </style>
 </head>
 <body>
@@ -284,10 +292,17 @@ footer{border-top:1px solid var(--line);padding:48px 0 56px;color:var(--ink3);fo
   <!-- CTA band -->
   <section style="padding-top:8px">
     <div class="wrap">
-      <div class="band">
-        <h2>생성형AI, 제대로 배워보세요</h2>
-        <p>기업 임직원 교육부터 개인·소규모 과정까지, 수준과 목적에 맞춰 설계해 드립니다.</p>
-        <a href="/교육문의/" class="btn btn-primary">교육 상담 문의하기</a>
+      <div class="cta-stack">
+        <a href="https://blog.naver.com/PostList.nhn?blogId=nosung&amp;categoryNo=39&amp;from=postList" target="_blank" rel="noopener" class="band sm dark">
+          <h2>강의 실제 사례 보기</h2>
+          <p>박노성 대표의 실제 강의 현장과 수강생들의 생생한 후기를 블로그에서 만나보세요.</p>
+          <span class="btn">사례 보러 가기 →</span>
+        </a>
+        <div class="band sm">
+          <h2>생성형AI, 제대로 배워보세요</h2>
+          <p>기업 임직원 교육부터 개인·소규모 과정까지, 수준과 목적에 맞춰 설계해 드립니다.</p>
+          <a href="/교육문의/" class="btn btn-primary">교육 상담 문의하기</a>
+        </div>
       </div>
     </div>
   </section>

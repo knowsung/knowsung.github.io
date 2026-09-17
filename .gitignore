@@ -31,3 +31,9 @@ logs/
 # 임시 파일
 *.tmp
 *.bak
+
+# 내부 작업 폴더 (공개 저장소에 올리지 않음)
+_backend/
+_prompt-app/
+Claude outputs/
+.claude/

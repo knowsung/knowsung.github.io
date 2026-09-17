@@ -173,6 +173,11 @@ footer{border-top:1px solid var(--line);padding:48px 0 56px;color:var(--ink3);fo
   .field-row{grid-template-columns:1fr;gap:0}
   .form-card{padding:28px 22px}
 }
+
+/* ===== 허니팟 / Turnstile (스팸 방지) ===== */
+.hp-wrap{position:absolute!important;left:-9999px!important;top:auto!important;width:1px;height:1px;overflow:hidden;opacity:0}
+.cf-slot{margin:4px 0 14px;min-height:0}
+.cf-slot:empty{margin:0}
 </style>
 </head>
 <body>
@@ -216,8 +221,12 @@ footer{border-top:1px solid var(--line);padding:48px 0 56px;color:var(--ink3);fo
 
           <div class="form-msg" id="form-msg" role="alert"></div>
 
-          <form id="contact-form" action="https://formspree.io/f/xykaagpo" method="POST">
-            <input type="hidden" name="_subject" value="[셰익스컴퍼니] 새 교육 문의">
+          <form id="contact-form" novalidate>
+            <!-- 허니팟: 화면에 안 보이는 필드. 봇이 채우면 서버에서 스팸격리로 보냅니다. -->
+            <div class="hp-wrap" aria-hidden="true">
+              <label for="website">Website</label>
+              <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+            </div>
             <div class="field-row">
               <div class="field">
                 <label for="name">이름<span class="req">*</span></label>
@@ -255,6 +264,8 @@ footer{border-top:1px solid var(--line);padding:48px 0 56px;color:var(--ink3);fo
               <label for="message">문의 내용<span class="req">*</span></label>
               <textarea id="message" name="message" placeholder="교육 대상, 인원, 희망 일정, 예산 등 자세히 적어주시면 더 정확하게 안내드릴 수 있습니다." required></textarea>
             </div>
+
+            <div id="cf-turnstile" class="cf-slot"></div>
 
             <button type="submit" class="btn btn-primary">문의 보내기</button>
             <p class="form-foot">제출하신 정보는 상담 목적으로만 사용되며 안전하게 관리됩니다.</p>
@@ -324,32 +335,136 @@ footer{border-top:1px solid var(--line);padding:48px 0 56px;color:var(--ink3);fo
   burger.addEventListener('click',()=>menu.classList.toggle('open'));
   menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>menu.classList.remove('open')));
 
-  // ===== Formspree AJAX 제출 (페이지 이동 없이 처리) =====
-  const form=document.getElementById('contact-form'), msg=document.getElementById('form-msg');
-  form.addEventListener('submit',async(e)=>{
+  /* ============================================================
+     교육문의 제출  —  Google Apps Script 백엔드
+     설정값 2개만 채우면 동작합니다.
+     ============================================================ */
+
+  // ① Apps Script 웹앱 배포 후 받은 /exec 주소를 붙여넣으세요.
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxg8xjH0x9BJaWb5ChrOeak6KCynzW0wMZOJ26w-bNCpXH790f7HdGHymMRHOvZ7RgT/exec';
+
+  // ② (선택) Cloudflare Turnstile 사이트 키. 비워두면 위젯이 안 뜹니다.
+  const TURNSTILE_SITE_KEY = '';
+
+  // ③ 알림 메일 중계용 Formspree 주소.
+  //    스팸이 아닌 문의(서버가 notify:true 를 돌려준 경우)만 여기로 한 번 더 보내
+  //    nosung@naver.com 으로 알림 메일이 갑니다.
+  //    Formspree 대시보드에서 Restrict to Domain 을 shakes.co.kr 로 켜두세요.
+  const FORMSPREE = 'https://formspree.io/f/xykaagpo';
+
+  async function relayEmail(p) {
+    try {
+      const fd = new FormData();
+      fd.append('name',     p.name);
+      fd.append('company',  p.company || '-');
+      fd.append('phone',    p.phone);
+      fd.append('email',    p.email);
+      fd.append('interest', p.interest);
+      fd.append('message',  p.message);
+      fd.append('_subject', '[셰익스컴퍼니] 새 교육 문의 — ' + p.name);
+      await fetch(FORMSPREE, {
+        method: 'POST',
+        body: fd,
+        headers: { Accept: 'application/json' }
+      });
+    } catch (e) {
+      // 중계가 실패해도 문의는 이미 구글 시트에 기록되어 있습니다.
+      console.warn('알림 메일 중계 실패:', e);
+    }
+  }
+
+  const form = document.getElementById('contact-form');
+  const msg  = document.getElementById('form-msg');
+  const openedAt = Date.now();
+
+  /* --- Turnstile 위젯 (키가 있을 때만 로드) --- */
+  if (TURNSTILE_SITE_KEY) {
+    const sc = document.createElement('script');
+    sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+    sc.async = true; sc.defer = true;
+    sc.onload = () => window.turnstile && window.turnstile.render('#cf-turnstile', {
+      sitekey: TURNSTILE_SITE_KEY, theme: 'light', language: 'ko'
+    });
+    document.head.appendChild(sc);
+  }
+
+  function show(kind, text) {
+    msg.className = 'form-msg ' + kind;
+    msg.textContent = text;
+    msg.style.display = 'block';
+    msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  /* --- 클라이언트 1차 검증 --- */
+  function validate(v) {
+    if (!v.name)  return '이름을 입력해 주세요.';
+    if (!v.phone) return '연락처를 입력해 주세요.';
+    if (!v.email) return '이메일을 입력해 주세요.';
+    if (!v.message) return '문의 내용을 입력해 주세요.';
+    if (!/^[^@\s]+@[^@\s]+\.[a-zA-Z]{2,}$/.test(v.email)) return '이메일 주소를 다시 확인해 주세요.';
+    const d = v.phone.replace(/\D/g, '').replace(/^82/, '0');
+    if (!/^0\d{8,10}$/.test(d)) return '연락처를 다시 확인해 주세요. (예: 010-1234-5678)';
+    if (v.message.replace(/\s/g, '').length < 10) return '문의 내용을 10자 이상 적어주시면 더 정확히 안내드릴 수 있습니다.';
+    return null;
+  }
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const btn=form.querySelector('button[type=submit]'), label=btn.textContent;
-    btn.disabled=true; btn.textContent='보내는 중...'; msg.style.display='none';
-    try{
-      const res=await fetch(form.action,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}});
-      if(res.ok){
+    const btn = form.querySelector('button[type=submit]');
+    const label = btn.textContent;
+    msg.style.display = 'none';
+
+    const val = id => (document.getElementById(id).value || '').trim();
+    const payload = {
+      name:     val('name'),
+      company:  val('company'),
+      phone:    val('phone'),
+      email:    val('email'),
+      interest: val('interest'),
+      message:  val('message'),
+      website:  val('website'),                                  // 허니팟
+      elapsed:  Math.round((Date.now() - openedAt) / 1000),      // 작성 소요 시간
+      ua:       navigator.userAgent,
+      ref:      document.referrer,
+      cfToken:  (window.turnstile && TURNSTILE_SITE_KEY)
+                  ? (window.turnstile.getResponse() || '') : ''
+    };
+
+    const err = validate(payload);
+    if (err) { show('err', err); return; }
+
+    if (TURNSTILE_SITE_KEY && !payload.cfToken) {
+      show('err', '자동 입력 방지 확인이 아직 끝나지 않았습니다. 잠시 후 다시 눌러주세요.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '보내는 중...';
+
+    try {
+      // text/plain 으로 보내야 preflight(OPTIONS) 없이 Apps Script 가 받습니다.
+      const res = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json().catch(() => ({ ok: res.ok }));
+
+      if (data.ok) {
         form.reset();
-        msg.className='form-msg ok';
-        msg.textContent='문의가 정상적으로 접수되었습니다. 빠른 시일 내에 연락드리겠습니다. 감사합니다!';
-        msg.style.display='block';
-        msg.scrollIntoView({behavior:'smooth',block:'center'});
-      }else{
-        const data=await res.json().catch(()=>({}));
-        msg.className='form-msg err';
-        msg.textContent=(data.errors&&data.errors.length)?data.errors.map(x=>x.message).join(' / '):'전송에 실패했습니다. 잠시 후 다시 시도하시거나 이메일로 문의해 주세요.';
-        msg.style.display='block';
+        if (window.turnstile && TURNSTILE_SITE_KEY) window.turnstile.reset();
+        show('ok', '문의가 정상적으로 접수되었습니다. 평일 기준 1영업일 안에 연락드리겠습니다. 감사합니다!');
+        if (window.gtag) gtag('event', 'generate_lead', { form: 'inquiry' });
+        // 스팸으로 판정된 문의는 notify 가 없으므로 메일이 나가지 않습니다.
+        if (data.notify) relayEmail(payload);
+      } else {
+        show('err', data.error || '전송에 실패했습니다. 카카오톡 상담이나 0507-1344-6422로 연락 주세요.');
       }
-    }catch(err){
-      msg.className='form-msg err';
-      msg.textContent='네트워크 오류로 전송하지 못했습니다. 잠시 후 다시 시도해 주세요.';
-      msg.style.display='block';
-    }finally{
-      btn.disabled=false; btn.textContent=label;
+    } catch (ex) {
+      show('err', '네트워크 오류로 전송하지 못했습니다. 카카오톡 상담 또는 nosung@naver.com 으로 보내주시면 바로 확인하겠습니다.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = label;
     }
   });
 </script>

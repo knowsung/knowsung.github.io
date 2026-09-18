@@ -258,6 +258,35 @@
       background: var(--bg2)
     }
 
+    /* 수강생용 도구 — 주 버튼(교육 프로그램·상담)보다 한 단계 가볍게.
+       같은 무게로 두면 무엇을 눌러야 할지 헷갈립니다. */
+    .btn-tool {
+      background: var(--bg2);
+      color: var(--ink2);
+      border-color: var(--line);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 99px
+    }
+
+    .btn-tool .ic {
+      font-size: 15px;
+      line-height: 1
+    }
+
+    .btn-tool:hover {
+      color: var(--red);
+      border-color: var(--red);
+      background: #fff;
+      transform: translateY(-1px)
+    }
+
+    .hero .actions.tools {
+      margin-top: 14px;
+      gap: 9px
+    }
+
     /* ===== Section ===== */
     section {
       padding: 72px 0
@@ -661,6 +690,12 @@
             <div class="actions">
               <a href="#programs" class="btn btn-primary">교육 프로그램 보기</a>
               <a href="#contact" class="btn btn-ghost">교육 상담 문의</a>
+            </div>
+            <div class="actions tools">
+              <a href="https://app.shakes.co.kr/" class="btn btn-tool" target="_blank" rel="noopener">
+                <span class="ic">🎓</span>수강생 전용 앱</a>
+              <a href="/prompt/" class="btn btn-tool">
+                <span class="ic">✨</span>프롬프트 업그레이더</a>
             </div>
           </div>
           <div class="hero-visual">

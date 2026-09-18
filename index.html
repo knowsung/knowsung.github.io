@@ -36,6 +36,11 @@
       --line2: #ededec;
       --red: #CE1126;
       --red-d: #A60E1F;
+      /* 로고 그림에서 뽑은 원색 */
+      --logo-blue: #183C90;
+      --logo-blue-d: #122E70;
+      --logo-green: #0C7854;
+      --logo-green-d: #095F42;
       --r: 14px;
       --maxw: 1080px;
     }
@@ -258,33 +263,36 @@
       background: var(--bg2)
     }
 
-    /* 수강생용 도구 — 주 버튼(교육 프로그램·상담)보다 한 단계 가볍게.
-       같은 무게로 두면 무엇을 눌러야 할지 헷갈립니다. */
-    .btn-tool {
-      background: var(--bg2);
-      color: var(--ink2);
-      border-color: var(--line);
-      font-size: 14px;
-      font-weight: 600;
-      padding: 10px 18px;
-      border-radius: 99px
+    /* 수강생용 도구 버튼.
+       색은 로고 그림에서 직접 뽑았습니다 — 셰익스피어 초상의 남색과 청록.
+       흰 글씨 대비는 각각 10.1:1, 5.5:1 로 작은 글씨에도 또렷합니다.
+       크기는 위 두 버튼과 똑같이 두어 네 개가 한 벌로 보이게 했습니다. */
+    .btn-blue {
+      background: var(--logo-blue);
+      color: #fff;
+      border-color: var(--logo-blue)
     }
 
-    .btn-tool .ic {
-      font-size: 15px;
-      line-height: 1
+    .btn-blue:hover {
+      background: var(--logo-blue-d);
+      border-color: var(--logo-blue-d);
+      transform: translateY(-1px)
     }
 
-    .btn-tool:hover {
-      color: var(--red);
-      border-color: var(--red);
-      background: #fff;
+    .btn-green {
+      background: var(--logo-green);
+      color: #fff;
+      border-color: var(--logo-green)
+    }
+
+    .btn-green:hover {
+      background: var(--logo-green-d);
+      border-color: var(--logo-green-d);
       transform: translateY(-1px)
     }
 
     .hero .actions.tools {
-      margin-top: 14px;
-      gap: 9px
+      margin-top: 12px
     }
 
     /* ===== Section ===== */
@@ -692,10 +700,8 @@
               <a href="#contact" class="btn btn-ghost">교육 상담 문의</a>
             </div>
             <div class="actions tools">
-              <a href="https://app.shakes.co.kr/" class="btn btn-tool" target="_blank" rel="noopener">
-                <span class="ic">🎓</span>수강생 전용 앱</a>
-              <a href="/prompt/" class="btn btn-tool">
-                <span class="ic">✨</span>프롬프트 업그레이더</a>
+              <a href="https://app.shakes.co.kr/" class="btn btn-blue" target="_blank" rel="noopener">수강생 전용 앱</a>
+              <a href="/prompt/" class="btn btn-green">프롬프트 업그레이더</a>
             </div>
           </div>
           <div class="hero-visual">

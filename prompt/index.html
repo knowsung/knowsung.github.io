@@ -62,6 +62,7 @@ header.top{
 }
 .nav{display:flex;align-items:center;gap:10px;height:66px;padding:0 24px;max-width:960px;margin:0 auto}
 .logo{display:flex;align-items:center;gap:9px;font-size:18px;font-weight:800;letter-spacing:-.03em}
+.logo img{width:32px;height:32px;border-radius:50%;display:block}
 .logo .sub{font-weight:600;color:var(--ink3);font-size:14px}
 .spacer{flex:1}
 
@@ -80,7 +81,9 @@ header.top{
 
 .wrap{max-width:860px;margin:0 auto;padding:0 24px 72px}
 
-.hero{text-align:center;padding:52px 0 8px}
+.hero{text-align:center;padding:48px 0 8px}
+.hero .mark{width:76px;height:76px;border-radius:50%;margin:0 auto 22px;display:block}
+@media (max-width:620px){ .hero .mark{width:62px;height:62px;margin-bottom:18px} }
 .eyebrow{
   display:inline-block;font-size:13px;font-weight:700;color:var(--red);
   border:1px solid var(--red-line);background:var(--red-soft);
@@ -208,7 +211,9 @@ input::placeholder,textarea::placeholder{color:var(--ink3)}
 
 <header class="top">
   <div class="nav">
-    <a class="logo" href="https://www.shakes.co.kr/"><span>셰익스컴퍼니</span>
+    <a class="logo" href="https://www.shakes.co.kr/">
+      <img src="/assets/img/logo-circle.png" alt="">
+      <span>셰익스컴퍼니</span>
       <span class="sub">프롬프트 업그레이더</span></a>
     <span class="spacer"></span>
     <a class="btn btn-ghost btn-sm" href="https://www.shakes.co.kr/">홈</a>
@@ -218,6 +223,7 @@ input::placeholder,textarea::placeholder{color:var(--ink3)}
 <div class="wrap">
 
   <div class="hero">
+    <img class="mark" src="/assets/img/logo-circle.png" alt="셰익스컴퍼니">
     <span class="eyebrow">무료 · 설치 없이</span>
     <h1>거친 질문을 <span class="red">쓸 만한 프롬프트</span>로</h1>
     <p>생각나는 대로 적어 보세요. 7가지 품질 요소에 맞춰 다시 써 드립니다.</p>

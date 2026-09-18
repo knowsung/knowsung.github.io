@@ -39,8 +39,8 @@
       /* 로고 그림에서 뽑은 원색 */
       --logo-blue: #183C90;
       --logo-blue-d: #122E70;
-      --logo-green: #0C7854;
-      --logo-green-d: #095F42;
+      --logo-orange: #AB5E11;
+      --logo-orange-d: #99540F;
       --r: 14px;
       --maxw: 1080px;
     }
@@ -265,7 +265,9 @@
 
     /* 수강생용 도구 버튼.
        색은 로고 그림에서 직접 뽑았습니다 — 셰익스피어 초상의 남색과 청록.
-       흰 글씨 대비는 각각 10.1:1, 5.5:1 로 작은 글씨에도 또렷합니다.
+       주황은 로고의 #E48424 를 그대로 쓰면 흰 글씨가 2.8:1 밖에 안 나와
+       같은 색상(30°)을 유지한 채 어둡게 내렸습니다.
+       흰 글씨 대비는 각각 10.1:1, 4.8:1 로 작은 글씨에도 읽힙니다.
        크기는 위 두 버튼과 똑같이 두어 네 개가 한 벌로 보이게 했습니다. */
     .btn-blue {
       background: var(--logo-blue);
@@ -279,15 +281,15 @@
       transform: translateY(-1px)
     }
 
-    .btn-green {
-      background: var(--logo-green);
+    .btn-orange {
+      background: var(--logo-orange);
       color: #fff;
-      border-color: var(--logo-green)
+      border-color: var(--logo-orange)
     }
 
-    .btn-green:hover {
-      background: var(--logo-green-d);
-      border-color: var(--logo-green-d);
+    .btn-orange:hover {
+      background: var(--logo-orange-d);
+      border-color: var(--logo-orange-d);
       transform: translateY(-1px)
     }
 
@@ -701,7 +703,7 @@
             </div>
             <div class="actions tools">
               <a href="https://app.shakes.co.kr/" class="btn btn-blue" target="_blank" rel="noopener">수강생 전용 앱</a>
-              <a href="/prompt/" class="btn btn-green">프롬프트 업그레이더</a>
+              <a href="/prompt/" class="btn btn-orange">프롬프트 업그레이더</a>
             </div>
           </div>
           <div class="hero-visual">

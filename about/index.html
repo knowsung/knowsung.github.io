@@ -49,6 +49,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.82);backdro
 .menu{display:flex;gap:2px;align-items:center}
 .menu a{font-size:14px;font-weight:500;color:var(--ink2);padding:8px 11px;border-radius:8px;transition:.15s;white-space:nowrap}
 .menu a:hover{background:var(--bg2);color:var(--red)}
+.menu a.on{background:var(--bg2);color:var(--red);font-weight:700}
 .menu .cta{background:var(--red);color:#fff;font-weight:600;padding:8px 16px;margin-left:6px}
 .menu .cta:hover{background:var(--red-d);color:#fff}
 .burger{display:none;flex-direction:column;gap:5px;background:none;border:0;cursor:pointer;padding:8px}
@@ -138,12 +139,11 @@ footer{border-top:1px solid var(--line);padding:48px 0 56px;color:var(--ink3);fo
   <div class="nav">
     <a href="/" class="logo"><img src="/assets/img/logo-circle.png" alt="셰익스컴퍼니 로고">셰익스컴퍼니</a>
     <nav class="menu" id="menu">
-      <a href="/about/">회사소개</a>
+      <a href="/about/" class="on">회사소개</a>
       <a href="/consultant/">컨설턴트소개</a>
-      <a href="/마케팅-커리큘럼/">마케팅교육</a>
-      <a href="/ai-커리큘럼/">생성형AI</a>
-      <a href="/인문학-커리큘럼/">인문학/리더십</a>
-      <a href="/서포터즈-기자단-커리큘럼/">서포터즈/기자단</a>
+      <a href="/커리큘럼/">교육 커리큘럼</a>
+      <a href="https://app.shakes.co.kr/" target="_blank" rel="noopener">수강생 전용 공간</a>
+      <a href="https://app.shakes.co.kr/resources" target="_blank" rel="noopener">자료실</a>
       <a href="/교육문의/" class="cta">교육상담</a>
     </nav>
     <button class="burger" id="burger" aria-label="메뉴"><span></span><span></span><span></span></button>

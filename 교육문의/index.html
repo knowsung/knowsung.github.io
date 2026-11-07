@@ -403,7 +403,7 @@ footer{border-top:1px solid var(--line);padding:48px 0 56px;color:var(--ink3);fo
     if (!v.message) return '문의 내용을 입력해 주세요.';
     if (!/^[^@\s]+@[^@\s]+\.[a-zA-Z]{2,}$/.test(v.email)) return '이메일 주소를 다시 확인해 주세요.';
     const d = v.phone.replace(/\D/g, '').replace(/^82/, '0');
-    if (!/^0\d{8,10}$/.test(d)) return '연락처를 다시 확인해 주세요. (예: 010-1234-5678)';
+    if (!/^0\d{8,10}$/.test(d) && !/^050\d{9}$/.test(d)) return '연락처를 다시 확인해 주세요. (예: 010-1234-5678)';
     if (v.message.replace(/\s/g, '').length < 10) return '문의 내용을 10자 이상 적어주시면 더 정확히 안내드릴 수 있습니다.';
     return null;
   }
